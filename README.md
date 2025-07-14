@@ -18,31 +18,33 @@ erDiagram
 %% Entidades Principais
     PESSOA ||--o{ JOVEM : "é"
     PESSOA ||--o{ RESPONSAVEL : "é"
-    JOVEM ||--|| LOBO : "é"
 
 %% Relacionamentos de Dados Pessoais
     JOVEM ||--o{ CONTATO : "tem"
     JOVEM ||--|| DADO_SAUDE : "possui"
+    JOVEM ||--o{ ALERGIA : "possui"
     JOVEM ||--o{ RESPONSAVEL_JOVEM : "tem"
     RESPONSAVEL_JOVEM }|--|| RESPONSAVEL : "vincula"
 
 %% Progressão e Atividades
-    LOBO ||--o{ PROGRESSAO : "conquista"
+    JOVEM ||--o{ PROGRESSAO : "conquista"
     PROGRESSAO }|--|| DISTINTIVO : "recebe"
-    LOBO ||--o{ ATIVIDADE_PARTICIPACAO : "participa"
+    JOVEM ||--o{ ATIVIDADE_PARTICIPACAO : "participa"
     ATIVIDADE_PARTICIPACAO }|--|| ATIVIDADE : "realiza"
 
 %% Especialidades e Insígnias
-    LOBO ||--o{ ESPECIALIDADE_JOVEM : "desenvolve"
+    JOVEM ||--o{ ESPECIALIDADE_JOVEM : "desenvolve"
     ESPECIALIDADE_JOVEM }|--|| ESPECIALIDADE : "conquista"
     ESPECIALIDADE ||--o{ REQUISITO_ESPECIALIDADE : "exige"
-    LOBO ||--o{ INSIGNIA_JOVEM : "obtém"
+    ESPECIALIDADE }|--|| AREA_CONHECIMENTO : "pertence"
+    JOVEM ||--o{ INSIGNIA_JOVEM : "obtém"
     INSIGNIA_JOVEM }|--|| INSIGNIA : "recebe"
     INSIGNIA ||--o{ REQUISITO_INSIGNIA : "requer"
 
 %% Requisitos e Níveis
     ESPECIALIDADE_JOVEM ||--|| NIVEL_ESPECIALIDADE : "atinge"
 
+%% Entidades
     PESSOA {
         int id_pessoa PK
         varchar nome
@@ -58,19 +60,14 @@ erDiagram
         int id_pessoa FK
         date data_ingresso
         varchar status
+        varchar patrulha
+        date data_promocao_proximo_nivel
     }
 
     RESPONSAVEL {
         int id_responsavel PK
         int id_pessoa FK
         varchar parentesco
-    }
-
-    LOBO {
-        int id_lobo PK
-        int id_jovem FK
-        varchar patrulha
-        date data_promocao_proximo_nivel
     }
 
     CONTATO {
@@ -85,22 +82,27 @@ erDiagram
         int id_dado_saude PK
         int id_jovem FK
         varchar tipo_sanguineo
-        text alergias
         text medicamentos
         text restricoes
         text observacoes
     }
 
-    RESPONSAVEL_JOVEM {
-        int id_responsavel_jovem PK
+    ALERGIA {
+        int id_alergia PK
         int id_jovem FK
-        int id_responsavel FK
+        varchar descricao
+        varchar gravidade
+        text tratamento
+    }
+
+    RESPONSAVEL_JOVEM {
+        int id_jovem PK,FK
+        int id_responsavel PK,FK
     }
 
     ESPECIALIDADE_JOVEM {
-        int id_especialidade_jovem PK
-        int id_lobo FK
-        int id_especialidade FK
+        int id_jovem PK,FK
+        int id_especialidade PK,FK
         date data_inicio
         date data_conclusao
         int nivel
@@ -121,6 +123,12 @@ erDiagram
         int total_requisitos
     }
 
+    AREA_CONHECIMENTO {
+        int id_area PK
+        varchar nome
+        text descricao
+    }
+
     REQUISITO_ESPECIALIDADE {
         int id_requisito PK
         int id_especialidade FK
@@ -129,9 +137,8 @@ erDiagram
     }
 
     ATIVIDADE_PARTICIPACAO {
-        int id_participacao PK
-        int id_lobo FK
-        int id_atividade FK
+        int id_jovem PK,FK
+        int id_atividade PK,FK
         boolean presenca
         varchar avaliacao
         text observacoes
@@ -148,7 +155,7 @@ erDiagram
 
     PROGRESSAO {
         int id_progressao PK
-        int id_lobo FK
+        int id_jovem FK
         int id_distintivo FK
         date data_conquista
         text observacoes
@@ -163,9 +170,8 @@ erDiagram
     }
 
     INSIGNIA_JOVEM {
-        int id_insignia_jovem PK
-        int id_lobo FK
-        int id_insignia FK
+        int id_jovem PK,FK
+        int id_insignia PK,FK
         date data_conquista
         text observacoes
     }
