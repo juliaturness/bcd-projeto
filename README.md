@@ -15,181 +15,140 @@ O diagrama está modelado em terceira forma normal (3FN) e contempla as entidade
 
 ```mermaid
 erDiagram
-%% Entidades Principais
-    PESSOA ||--o{ JOVEM : "é"
-    PESSOA ||--o{ RESPONSAVEL : "é"
 
-%% Relacionamentos de Dados Pessoais
-    JOVEM ||--o{ CONTATO : "tem"
-    JOVEM ||--|| DADO_SAUDE : "possui"
-    JOVEM ||--o{ ALERGIA : "possui"
-    JOVEM ||--o{ RESPONSAVEL_JOVEM : "tem"
-    RESPONSAVEL_JOVEM }|--|| RESPONSAVEL : "vincula"
+%% RELACIONAMENTOS
 
-%% Progressão e Atividades
-    JOVEM ||--o{ PROGRESSAO : "conquista"
-    PROGRESSAO }|--|| DISTINTIVO : "recebe"
-    JOVEM ||--o{ ATIVIDADE_PARTICIPACAO : "participa"
-    ATIVIDADE_PARTICIPACAO }|--|| ATIVIDADE : "realiza"
+    PESSOA ||--o{ VINCULO : "possui"
+    RESPONSAVEL ||--o{ VINCULO : "responsável por"
+    PESSOA ||--o{ DADO_SAUDE : "tem"
+    PROBLEMAS_SAUDE ||--|| DADO_SAUDE : "é"
+    TIPO_SANGUINEO ||--o{ PESSOA : "tipo de"
 
-%% Especialidades e Insígnias
-    JOVEM ||--o{ ESPECIALIDADE_JOVEM : "desenvolve"
-    ESPECIALIDADE_JOVEM }|--|| ESPECIALIDADE : "conquista"
-    ESPECIALIDADE ||--o{ REQUISITO_ESPECIALIDADE : "exige"
-    ESPECIALIDADE }|--|| AREA_CONHECIMENTO : "pertence"
-    JOVEM ||--o{ INSIGNIA_JOVEM : "obtém"
-    INSIGNIA_JOVEM }|--|| INSIGNIA : "recebe"
-    INSIGNIA ||--o{ REQUISITO_INSIGNIA : "requer"
+    PESSOA ||--o{ DESAFIOS_DISTINTIVOS_FEITOS : "realiza"
+    DESAFIOS_DISTINTIVOS ||--o{ DESAFIOS_DISTINTIVOS_FEITOS : "pertence"
+    DISTINTIVOS ||--o{ DESAFIOS_DISTINTIVOS : "compõe"
 
-%% Requisitos e Níveis
-    ESPECIALIDADE_JOVEM ||--|| NIVEL_ESPECIALIDADE : "atinge"
+    PESSOA ||--o{ NOITES_ACAMPADAS : "acampa"
+    ACAMPAMENTOS ||--o{ NOITES_ACAMPADAS : "contém"
 
-%% Entidades
+    PESSOA ||--o{ DESAFIOS_INSIGNIA_FEITOS : "realiza"
+    DESAFIOS_INSIGNIA ||--o{ DESAFIOS_INSIGNIA_FEITOS : "pertence"
+    INSIGNIAS ||--o{ DESAFIOS_INSIGNIA : "compõe"
+
+    PESSOA ||--o{ DESAFIO_ESPECIALIDADE : "executa"
+    DESAFIOS_ESPECIALIDADE ||--o{ DESAFIO_ESPECIALIDADE : "é"
+    ESPECIALIDADE ||--o{ DESAFIOS_ESPECIALIDADE : "tem"
+    AREA_CONHECIMENTO ||--o{ ESPECIALIDADE : "pertence"
+
+%% ENTIDADES
+
     PESSOA {
         int id_pessoa PK
         varchar nome
         date data_nascimento
-        varchar endereco
-        char genero
+        varchar telefone
         varchar cpf
-        int telefone
+        int id_tipo_sanguineo FK
     }
 
-    JOVEM {
-        int id_jovem PK
+    VINCULO {
         int id_pessoa FK
-        date data_ingresso
-        varchar status
-        varchar patrulha
-        date data_promocao_proximo_nivel
+        int id_responsavel FK
     }
 
     RESPONSAVEL {
         int id_responsavel PK
         int id_pessoa FK
-        varchar parentesco
+        varchar nome
+        varchar email
+        varchar telefone
     }
 
-    CONTATO {
-        int id_contato PK
-        int id_pessoa FK
+    TIPO_SANGUINEO {
+        int id_tipo_sanguineo PK
         varchar tipo
-        varchar valor
-        boolean principal
     }
 
     DADO_SAUDE {
-        int id_dado_saude PK
-        int id_jovem FK
-        varchar tipo_sanguineo
-        text medicamentos
-        text restricoes
-        text observacoes
+        int id_pessoa FK
+        int id_problema_saude FK
     }
 
-    ALERGIA {
-        int id_alergia PK
-        int id_jovem FK
+    PROBLEMAS_SAUDE {
+        int id_problema_saude PK
+        varchar tipo_problema
         varchar descricao
-        varchar gravidade
-        text tratamento
     }
 
-    RESPONSAVEL_JOVEM {
-        int id_jovem PK,FK
-        int id_responsavel PK,FK
-    }
-
-    ESPECIALIDADE_JOVEM {
-        int id_jovem PK,FK
-        int id_especialidade PK,FK
-        date data_inicio
-        date data_conclusao
-        int nivel
-        int requisitos_completos
-    }
-
-    NIVEL_ESPECIALIDADE {
-        int id_nivel PK
+    DISTINTIVOS {
+        int id_distintivo PK
         varchar nome
-        text criterio_conquista
+    }
+
+    DESAFIOS_DISTINTIVOS {
+        int id_desafio_distintivo PK
+        varchar descricao
+        int id_distintivo FK
+    }
+
+    DESAFIOS_DISTINTIVOS_FEITOS {
+        int id_desafio_distintivo FK
+        int id_pessoa FK
+        date data_inicio
+        date data_fim
+    }
+
+    ACAMPAMENTOS {
+        int id_acampamento PK
+        varchar nome
+        date data
+    }
+
+    NOITES_ACAMPADAS {
+        int id_acampamento FK
+        int id_pessoa FK
+    }
+
+    INSIGNIAS {
+        int id_insignia PK
+        varchar nome
+    }
+
+    DESAFIOS_INSIGNIA {
+        int id_desafio_insignia PK
+        varchar nome
+        int id_insignia FK
+    }
+
+    DESAFIOS_INSIGNIA_FEITOS {
+        int id_desafio_insignia FK
+        int id_pessoa FK
+        date data
+    }
+
+    AREA_CONHECIMENTO {
+        int id_area_conhecimento PK
+        varchar nome
     }
 
     ESPECIALIDADE {
         int id_especialidade PK
-        int id_area FK
         varchar nome
-        text descricao
-        int total_requisitos
+        int id_area_conhecimento FK
     }
 
-    AREA_CONHECIMENTO {
-        int id_area PK
-        varchar nome
-        text descricao
-    }
-
-    REQUISITO_ESPECIALIDADE {
-        int id_requisito PK
+    DESAFIOS_ESPECIALIDADE {
+        int id_desafio_especialidade PK
+        varchar descricao
         int id_especialidade FK
-        text descricao
-        int etapa
     }
 
-    ATIVIDADE_PARTICIPACAO {
-        int id_jovem PK,FK
-        int id_atividade PK,FK
-        boolean presenca
-        varchar avaliacao
-        text observacoes
-    }
-
-    ATIVIDADE {
-        int id_atividade PK
-        varchar nome
-        text descricao
+    DESAFIO_ESPECIALIDADE {
+        int id_desafio_especialidade FK
+        int id_pessoa FK
         date data
-        varchar local
-        varchar tipo
     }
 
-    PROGRESSAO {
-        int id_progressao PK
-        int id_jovem FK
-        int id_distintivo FK
-        date data_conquista
-        text observacoes
-        boolean aprovado_velho_lobo
-    }
-
-    DISTINTIVO {
-        int id_distintivo PK
-        varchar nome
-        text descricao
-        int ordem_progressao
-    }
-
-    INSIGNIA_JOVEM {
-        int id_jovem PK,FK
-        int id_insignia PK,FK
-        date data_conquista
-        text observacoes
-    }
-
-    INSIGNIA {
-        int id_insignia PK
-        varchar nome
-        text descricao
-        int total_requisitos
-        varchar tipo
-    }
-
-    REQUISITO_INSIGNIA {
-        int id_requisito PK
-        int id_insignia FK
-        text descricao
-        int etapa
-    }
 ```
 
 **Aluna:** Júlia Manuela Turnes
