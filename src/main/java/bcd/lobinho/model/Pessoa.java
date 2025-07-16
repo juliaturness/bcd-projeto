@@ -3,22 +3,28 @@ package bcd.lobinho.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+import java.util.List;
+
 
 @Entity
-@Table(name = "Pessoa")
+@Table(name = "pessoa")
 public class Pessoa {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Integer id;
+    private Integer id_pessoa;
 
     @Column(nullable = false)
     private String nome;
+
     @Column(nullable = false, unique = true)
     private String cpf;
+
     @Column(nullable = false)
     private String endereco;
+
     private String telefone;
-    private String dataNascimento;
+    private LocalDate dataNascimento;
     private String genero;
 
 
@@ -30,19 +36,19 @@ public class Pessoa {
     private DadosSaude dadoSaude;
 
     @OneToOne(mappedBy = "pessoa", cascade = CascadeType.ALL)
-    private Vinculo vinculo;
+    private List<Vinculo> vinculo;
 
-    @OneToOne(mappedBy = "pessoa", cascade = CascadeType.ALL)
-    private // desafios destinitvos
+    @OneToMany(mappedBy = "pessoa")
+    private List<DesafioDistintivoFeito> desafiosDistintivos;
 
-    @OneToOne(mappedBy = "pessoa", cascade = CascadeType.ALL)
-    private // noites acampapdas
+    @OneToMany(mappedBy = "pessoa")
+    private List<NoiteAcampada> noitesAcampadas;
 
-    @OneToOne(mappedBy = "pessoa", cascade = CascadeType.ALL)
-    private // desafois insignia
+    @OneToMany(mappedBy = "pessoa")
+    private List<DesafioInsigniaFeito> desafiosInsignias;
 
-    @OneToOne(mappedBy = "pessoa", cascade = CascadeType.ALL)
-    private // desafio especialidade 
+    @OneToMany(mappedBy = "pessoa")
+    private List<DesafioEspecialidadeFeito> desafiosEspecialidades;
 
 
 }
