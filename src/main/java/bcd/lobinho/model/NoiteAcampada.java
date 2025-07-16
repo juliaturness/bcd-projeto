@@ -20,14 +20,14 @@ public class NoiteAcampada {
     @MapsId("idPessoa")
     @JoinColumn(name = "id_pessoa", nullable = false)
     private Pessoa pessoa;
-}
 
 
-@Embeddable
-class NoiteAcampadaId implements Serializable {
-    @Column(name = "id_acampamento")
-    private Integer idAcampamento;
+    @Embeddable
+    public class NoiteAcampadaId implements Serializable {
+        @Column(name = "id_acampamento")
+        private Integer idAcampamento;
 
-    @Column(name = "id_pessoa")
-    private Integer idPessoa;
+        @Column(name = "id_pessoa")
+        private Integer idPessoa;
+    }
 }

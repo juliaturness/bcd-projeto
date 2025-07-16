@@ -24,14 +24,14 @@ public class DesafioInsigniaFeito {
     @MapsId("idPessoa")
     @JoinColumn(name = "id_pessoa", nullable = false)
     private Pessoa pessoa;
-}
 
 
-@NoArgsConstructor
-class DesafioInsigniaFeitoId implements Serializable {
-    @Column(name = "id_desafio_insignia")
-    private Integer idDesafioInsignia;
+    @NoArgsConstructor
+    public class DesafioInsigniaFeitoId implements Serializable {
+        @Column(name = "id_desafio_insignia")
+        private Integer idDesafioInsignia;
 
-    @Column(name = "id_pessoa")
-    private Integer idPessoa;
+        @Column(name = "id_pessoa")
+        private Integer idPessoa;
+    }
 }

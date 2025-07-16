@@ -25,11 +25,11 @@ public class DesafioDistintivoFeito {
     @MapsId("idPessoa")
     @JoinColumn(name = "id_pessoa")
     private Pessoa pessoa;
-}
 
 
-@Embeddable
-class DesafioDistintivoFeitoId implements Serializable {
-    private Integer idDesafioDistintivo;
-    private Integer idPessoa;
+    @Embeddable
+    public class DesafioDistintivoFeitoId implements Serializable {
+        private Integer idDesafioDistintivo;
+        private Integer idPessoa;
+    }
 }

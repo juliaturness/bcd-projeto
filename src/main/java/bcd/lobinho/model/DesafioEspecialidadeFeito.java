@@ -23,13 +23,13 @@ public class DesafioEspecialidadeFeito {
     @MapsId("idPessoa")
     @JoinColumn(name = "id_pessoa", nullable = false)
     private Pessoa pessoa;
-}
 
-@Embeddable
-class DesafioEspecialidadeFeitoId implements Serializable {
-    @Column(name = "id_desafio_especialidade")
-    private Integer idDesafioEspecialidade;
+    @Embeddable
+    public class DesafioEspecialidadeFeitoId implements Serializable {
+        @Column(name = "id_desafio_especialidade")
+        private Integer idDesafioEspecialidade;
 
-    @Column(name = "id_pessoa")
-    private Integer idPessoa;
+        @Column(name = "id_pessoa")
+        private Integer idPessoa;
+    }
 }
