@@ -1,4 +1,10 @@
 package bcd.lobinho.repository;
 
-public class InsigniaRepository {
+import bcd.lobinho.model.Insignia;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
+
+
+public interface InsigniaRepository extends JpaRepository<Insignia, Integer> {
+    List<Insignia> findByNomeContainingIgnoreCase(String nome);
 }
