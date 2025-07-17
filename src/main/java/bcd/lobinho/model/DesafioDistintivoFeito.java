@@ -3,7 +3,9 @@ package bcd.lobinho.model;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "desafio_distintivo_feito")
 public class DesafioDistintivoFeito {

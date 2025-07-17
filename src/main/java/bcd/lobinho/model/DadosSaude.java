@@ -1,7 +1,9 @@
 package bcd.lobinho.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "dados_saude")
 public class DadosSaude {

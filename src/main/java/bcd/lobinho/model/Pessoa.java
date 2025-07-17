@@ -1,12 +1,11 @@
 package bcd.lobinho.model;
 
-
 import jakarta.persistence.*;
-
+import lombok.Data;
 import java.time.LocalDate;
 import java.util.List;
 
-
+@Data
 @Entity
 @Table(name = "pessoa")
 public class Pessoa {
@@ -35,8 +34,8 @@ public class Pessoa {
     @OneToOne(mappedBy = "pessoa", cascade = CascadeType.ALL)
     private DadosSaude dadoSaude;
 
-    @OneToOne(mappedBy = "pessoa", cascade = CascadeType.ALL)
-    private List<Vinculo> vinculo;
+    @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL)
+    private List<Vinculo> vinculos;
 
     @OneToMany(mappedBy = "pessoa")
     private List<DesafioDistintivoFeito> desafiosDistintivos;

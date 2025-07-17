@@ -2,8 +2,9 @@ package bcd.lobinho.model;
 
 import jakarta.persistence.*;
 import java.util.List;
+import lombok.Data;
 
-
+@Data
 @Entity
 @Table(name = "especialidade")
 public class Especialidade {

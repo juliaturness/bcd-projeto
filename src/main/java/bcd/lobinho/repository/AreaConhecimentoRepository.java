@@ -6,5 +6,4 @@ import java.util.List;
 
 
 public interface AreaConhecimentoRepository extends JpaRepository<AreaConhecimento, Integer> {
-    List<AreaConhecimento> findByNomeContainingIgnoreCase(String nome);
 }

@@ -2,7 +2,9 @@ package bcd.lobinho.model;
 
 import jakarta.persistence.*;
 import java.util.List;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "problema_saude")
 public class ProblemasSaude {

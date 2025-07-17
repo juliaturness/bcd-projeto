@@ -5,6 +5,7 @@ import lombok.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+@Data
 @Entity
 @Table(name = "desafio_especialidade_feito")
 public class DesafioEspecialidadeFeito {

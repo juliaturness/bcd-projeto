@@ -1,9 +1,9 @@
 package bcd.lobinho.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
-import java.util.List;
-
+@Data
 @Entity
 @Table(name = "desafio_distintivo")
 public class DesafioDistintivo {
@@ -11,12 +11,11 @@ public class DesafioDistintivo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(nullable = false, length = 500)
     private String descricao;
 
     @ManyToOne
     @JoinColumn(name = "id_distintivo")
     private Distintivo distintivo;
 
-    @OneToMany(mappedBy = "desafioDistintivo")
-    private List<DesafioDistintivoFeito> realizacoes;
 }

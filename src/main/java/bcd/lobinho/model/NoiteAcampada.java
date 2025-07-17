@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.io.Serializable;
 
-
+@Data
 @Entity
 @Table(name = "noite_acampada")
 public class NoiteAcampada {

@@ -1,10 +1,10 @@
 package bcd.lobinho.model;
 
-
 import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.util.List;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "acampamento")
 public class Acampamento {
@@ -19,6 +19,4 @@ public class Acampamento {
     @Column(nullable = false)
     private LocalDate data;
 
-    @OneToMany(mappedBy = "acampamento", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<NoiteAcampada> participantes;
 }

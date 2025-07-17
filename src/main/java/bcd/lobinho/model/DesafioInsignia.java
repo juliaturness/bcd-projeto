@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
 
-
+@Data
 @Entity
 @Table(name = "desafio_insignia")
 public class DesafioInsignia {
