@@ -230,3 +230,33 @@ INSERT INTO acampamento (id_acampamento, nome, data_inicio, data_fim, tipo) VALU
 INSERT INTO participacao_acampamento (id_pessoa, id_acampamento) VALUES
 (1, 1), (1, 2), (1, 3), -- Taylor participou de 3 acampamentos
 (2, 1), (2, 2); -- Betty participou de 2 acampamentos
+
+-- 1. Jovens aptos para o Cruzeiro do Sul
+SELECT p.nome
+FROM pessoa p
+         JOIN progressao_lobinho pl ON p.id_pessoa = pl.id_pessoa
+WHERE pl.id_etapa_atual = 3 -- Saltador
+  AND (
+    -- Verifica se participou de pelo menos 3 acampamentos
+    (SELECT COUNT(*) FROM participacao_acampamento pa WHERE pa.id_pessoa = p.id_pessoa) >= 3
+        -- Verifica se conquistou pelo menos 5 especialidades de 3 áreas diferentes
+        AND (SELECT COUNT(DISTINCT e.id_area_conhecimento)
+             FROM conquista_especialidade ce
+                      JOIN especialidade e ON ce.id_especialidade = e.id_especialidade
+             WHERE ce.id_pessoa = p.id_pessoa) >= 3
+        -- Verifica se conquistou pelo menos 1 insígnia de interesse especial
+        AND (SELECT COUNT(*) FROM conquista_insignia ci WHERE ci.id_pessoa = p.id_pessoa) >= 1
+    );
+
+-- 2. Especialidades de um jovem específico
+SELECT e.nome, a.nome AS area
+FROM conquista_especialidade ce
+         JOIN especialidade e ON ce.id_especialidade = e.id_especialidade
+         JOIN area_conhecimento a ON e.id_area_conhecimento = a.id_area_conhecimento
+WHERE ce.id_pessoa = 1; -- ID do jovem
+
+-- 3. Progressão atual de todos os jovens
+SELECT p.nome, ep.nome AS etapa_atual
+FROM progressao_lobinho pl
+         JOIN pessoa p ON pl.id_pessoa = p.id_pessoa
+         JOIN etapa_progressao ep ON pl.id_etapa_atual = ep.id_etapa;
