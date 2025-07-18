@@ -1,10 +1,8 @@
 package bcd.lobinho.service;
 
 import bcd.lobinho.exception.ResourceNotFoundException;
-import bcd.lobinho.model.DadosSaude;
 import bcd.lobinho.model.Pessoa;
 import bcd.lobinho.model.TipoSanguineo;
-import bcd.lobinho.repository.DadosSaudeRepository;
 import bcd.lobinho.repository.PessoaRepository;
 import bcd.lobinho.repository.TipoSanguineoRepository;
 import org.springframework.stereotype.Service;
@@ -17,14 +15,11 @@ public class PessoaService {
 
     private final PessoaRepository pessoaRepository;
     private final TipoSanguineoRepository tipoSanguineoRepository;
-    private final DadosSaudeRepository dadoSaudeRepository;
 
     public PessoaService(PessoaRepository pessoaRepository,
-                         TipoSanguineoRepository tipoSanguineoRepository,
-                         DadosSaudeRepository dadoSaudeRepository) {
+                         TipoSanguineoRepository tipoSanguineoRepository) {
         this.pessoaRepository = pessoaRepository;
         this.tipoSanguineoRepository = tipoSanguineoRepository;
-        this.dadoSaudeRepository = dadoSaudeRepository;
     }
 
     @Transactional(readOnly = true)
@@ -34,17 +29,24 @@ public class PessoaService {
 
     @Transactional(readOnly = true)
     public Pessoa buscarPorId(Integer id) {
-        return pessoaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada com id: " + id));
+        return pessoaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada com id: " + id));
     }
 
     @Transactional
     public Pessoa criar(Pessoa pessoa) {
-        if(pessoa.getTipoSanguineo() != null && pessoa.getTipoSanguineo().getId() != null) {
-            TipoSanguineo tipoSanguineo = tipoSanguineoRepository.findById(pessoa.getTipoSanguineo().getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Tipo sanguíneo não encontrado"));
-            pessoa.setTipoSanguineo(tipoSanguineo);
+        // Validar CPF único
+        if (pessoaRepository.findByCpf(pessoa.getCpf()).isPresent()) {
+            throw new IllegalArgumentException("CPF já cadastrado.");
         }
+
+        // Se tiver tipo sanguíneo, verificar existência e associar
+        if (pessoa.getTipoSanguineo() != null && pessoa.getTipoSanguineo().getId() != null) {
+            TipoSanguineo tipo = tipoSanguineoRepository.findById(pessoa.getTipoSanguineo().getId()).orElseThrow(() -> new ResourceNotFoundException("Tipo sanguíneo não encontrado"));
+            pessoa.setTipoSanguineo(tipo);
+        } else {
+            pessoa.setTipoSanguineo(null);
+        }
+
         return pessoaRepository.save(pessoa);
     }
 
@@ -53,48 +55,50 @@ public class PessoaService {
         Pessoa pessoaExistente = pessoaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada com id: " + id));
 
-        pessoaExistente.setNome(pessoaAtualizada.getNome());
-        pessoaExistente.setDataNascimento(pessoaAtualizada.getDataNascimento());
-        pessoaExistente.setTelefone(pessoaAtualizada.getTelefone());
-        pessoaExistente.setCpf(pessoaAtualizada.getCpf());
+        // Validar CPF se alterado
+        if (!pessoaExistente.getCpf().equals(pessoaAtualizada.getCpf())) {
+            if (pessoaRepository.findByCpf(pessoaAtualizada.getCpf()).isPresent()) {
+                throw new IllegalArgumentException("CPF já cadastrado para outra pessoa.");
+            }
+        }
 
-        if(pessoaAtualizada.getTipoSanguineo() != null) {
-            TipoSanguineo tipoSanguineo = tipoSanguineoRepository.findById(pessoaAtualizada.getTipoSanguineo().getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Tipo sanguíneo não encontrado"));
-            pessoaExistente.setTipoSanguineo(tipoSanguineo);
+        pessoaExistente.setNome(pessoaAtualizada.getNome());
+        pessoaExistente.setCpf(pessoaAtualizada.getCpf());
+        pessoaExistente.setEndereco(pessoaAtualizada.getEndereco());
+        pessoaExistente.setTelefone(pessoaAtualizada.getTelefone());
+        pessoaExistente.setDataNascimento(pessoaAtualizada.getDataNascimento());
+        pessoaExistente.setGenero(pessoaAtualizada.getGenero());
+
+        // Atualizar tipo sanguíneo
+        if (pessoaAtualizada.getTipoSanguineo() != null && pessoaAtualizada.getTipoSanguineo().getId() != null) {
+            TipoSanguineo tipo = tipoSanguineoRepository.findById(pessoaAtualizada.getTipoSanguineo().getId()).orElseThrow(() -> new ResourceNotFoundException("Tipo sanguíneo não encontrado"));
+            pessoaExistente.setTipoSanguineo(tipo);
+        } else {
+            pessoaExistente.setTipoSanguineo(null);
         }
 
         return pessoaRepository.save(pessoaExistente);
     }
 
     @Transactional
-    public Pessoa salvar(Pessoa pessoa) {
-        return pessoaRepository.save(pessoa);
-    }
-
-    @Transactional
     public void excluir(Integer id) {
-        Pessoa pessoa = pessoaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada com id: " + id));
+        Pessoa pessoa = pessoaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada com id: " + id));
         pessoaRepository.delete(pessoa);
     }
 
     @Transactional
+    public Pessoa salvar(Pessoa pessoa) {
+        pessoaRepository.save(pessoa);
+        return pessoa;
+    }
+
+    @Transactional(readOnly = true)
     public Pessoa buscarPorCpf(String cpf) {
-        return pessoaRepository.findByCpf(cpf);
+        return pessoaRepository.findByCpf(cpf).orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada com CPF: " + cpf));
     }
 
     @Transactional(readOnly = true)
     public List<Pessoa> buscarPorNome(String nome) {
         return pessoaRepository.findByNomeContainingIgnoreCase(nome);
-    }
-
-    @Transactional
-    public DadosSaude adicionarDadoSaude(Integer idPessoa, DadosSaude dadoSaude) {
-        Pessoa pessoa = pessoaRepository.findById(idPessoa)
-                .orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada"));
-
-        dadoSaude.setPessoa(pessoa);
-        return dadoSaudeRepository.save(dadoSaude);
     }
 }

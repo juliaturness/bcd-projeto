@@ -31,12 +31,12 @@ public class PessoaController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<Pessoa> atualizar(
+    public Pessoa atualizar(
             @PathVariable Integer id,
             @RequestBody Pessoa pessoaAtualizada) {
 
         Pessoa pessoa = pessoaService.atualizar(id, pessoaAtualizada);
-        return ResponseEntity.ok(pessoa);
+        return pessoa;
     }
 
     @DeleteMapping("/{id}")

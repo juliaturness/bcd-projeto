@@ -1,5 +1,6 @@
 SET FOREIGN_KEY_CHECKS = 0;
-
+CREATE DATABASE IF NOT exists LOBINHO;
+USE LOBINHO;
 DROP TABLE IF EXISTS participacao_acampamento;
 DROP TABLE IF EXISTS conquista_distintivo;
 DROP TABLE IF EXISTS conquista_insignia;
@@ -19,8 +20,7 @@ DROP TABLE IF EXISTS responsavel;
 DROP TABLE IF EXISTS pessoa;
 DROP TABLE IF EXISTS tipo_sanguineo;
 
-CREATE DATABASE IF NOT exists LOBINHO;
-USE LOBINHO;
+
 
 -- Tabela de Tipos Sanguíneos
 CREATE TABLE IF NOT EXISTS tipo_sanguineo (
