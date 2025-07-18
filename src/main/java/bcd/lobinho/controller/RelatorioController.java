@@ -1,6 +1,7 @@
 package bcd.lobinho.controller;
 
 
+import bcd.lobinho.model.DesafioEspecialidadeFeito;
 import bcd.lobinho.model.Pessoa;
 import bcd.lobinho.model.dto.JovemProgressaoDTO;
 import bcd.lobinho.service.RelatorioService;
@@ -34,7 +35,7 @@ public class RelatorioController {
     }
 
     @GetMapping("/requisitos/{jovemId}/{especialidadeId}")
-    public List<Object[]> getRequisitosCompletos(
+    public List<DesafioEspecialidadeFeito> getRequisitosCompletos(
             @PathVariable Long jovemId,
             @PathVariable Long especialidadeId) {
         return relatorioService.getRequisitosCompletos(jovemId, especialidadeId);

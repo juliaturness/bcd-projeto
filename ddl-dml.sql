@@ -1,3 +1,27 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS participacao_acampamento;
+DROP TABLE IF EXISTS conquista_distintivo;
+DROP TABLE IF EXISTS conquista_insignia;
+DROP TABLE IF EXISTS conquista_especialidade;
+DROP TABLE IF EXISTS progressao_lobinho;
+DROP TABLE IF EXISTS desafios_distintivos;
+DROP TABLE IF EXISTS distintivo;
+DROP TABLE IF EXISTS especialidade;
+DROP TABLE IF EXISTS area_conhecimento;
+DROP TABLE IF EXISTS insignia;
+DROP TABLE IF EXISTS etapa_progressao;
+DROP TABLE IF EXISTS acampamento;
+DROP TABLE IF EXISTS dado_saude;
+DROP TABLE IF EXISTS problemas_saude;
+DROP TABLE IF EXISTS vinculo;
+DROP TABLE IF EXISTS responsavel;
+DROP TABLE IF EXISTS pessoa;
+DROP TABLE IF EXISTS tipo_sanguineo;
+
+CREATE DATABASE IF NOT exists LOBINHO;
+USE LOBINHO;
+
 -- Tabela de Tipos Sanguíneos
 CREATE TABLE IF NOT EXISTS tipo_sanguineo (
 id INT PRIMARY KEY AUTO_INCREMENT,
@@ -231,20 +255,99 @@ INSERT INTO participacao_acampamento (id_pessoa, id_acampamento) VALUES
 (1, 1), (1, 2), (1, 3), -- Taylor participou de 3 acampamentos
 (2, 1), (2, 2); -- Betty participou de 2 acampamentos
 
+
+-- Novas pessoas baseadas nas músicas da Taylor Swift
+INSERT INTO pessoa (id_pessoa, nome, cpf, endereco, telefone, data_nascimento, genero, id_tipo_sanguineo) VALUES
+          (4, 'Cassandra', '113.113.113-13', 'The Tortured Poets Department', '(11) 91111-1111', '2024-04-19', 'Feminino', 1),
+          (5, 'Clara Bow', '213.213.213-13', 'The Tortured Poets Department', '(11) 92222-2222', '2024-04-19', 'Feminino', 2),
+          (6, 'John', '313.313.313-13', 'Speak Now', '(11) 93333-3333', '2010-10-25', 'Masculino', 3),
+          (7, 'Ivy', '413.413.413-13', 'Evermore', '(11) 94444-4444', '2020-12-11', 'Feminino', 4);
+
+-- Progressão das novas pessoas
+INSERT INTO progressao_lobinho (id_progressao, id_pessoa, id_etapa_atual, data_inicio) VALUES
+(4, 4, 1, '2024-04-21'), -- Cassandra
+(5, 5, 2, '2024-05-01'), -- Clara Bow
+(6, 6, 3, '2023-11-01'), -- John
+(7, 7, 2, '2024-01-10'); -- Ivy
+
+-- Conquistas de especialidades
+INSERT INTO conquista_especialidade (id_pessoa, id_especialidade, data_conquista) VALUES
+(4, 1, '2024-05-01'), -- Informática
+(4, 3, '2024-05-02'), -- Artesanato
+
+(5, 4, '2024-05-03'), -- Natação
+(5, 5, '2024-05-04'), -- Observação de Aves
+(5, 6, '2024-05-05'), -- Reciclagem
+
+(6, 2, '2023-11-02'), -- Primeiros Socorros
+(6, 6, '2023-11-03'),
+(6, 7, '2023-11-04'), -- Serviço Voluntário
+
+(7, 3, '2024-01-15'), -- Artesanato
+(7, 5, '2024-01-20'), -- Observação de Aves
+(7, 6, '2024-01-25');  -- Reciclagem
+
+-- Conquistas de insígnias
+INSERT INTO conquista_insignia (id_pessoa, id_insignia, data_conquista) VALUES
+(4, 1, '2024-05-10'), -- Campeões da Natureza
+(5, 4, '2024-05-11'), -- Luzofória
+(6, 5, '2023-11-05'), -- Ação Comunitária
+(7, 7, '2024-01-30');  -- Aprender
+
+-- Participação em acampamentos
+INSERT INTO participacao_acampamento (id_pessoa, id_acampamento) VALUES
+(4, 1),
+(5, 1), (5, 2),
+(6, 1), (6, 2), (6, 3),
+(7, 2), (7, 3);
+
+-- Taylor conquista especialidades
+INSERT INTO conquista_especialidade (id_pessoa, id_especialidade, data_conquista) VALUES
+                                                                                      (1, 1, '2023-01-10'), -- Informática
+                                                                                      (1, 3, '2023-01-15'), -- Artesanato
+                                                                                      (1, 4, '2023-01-20'), -- Natação
+                                                                                      (1, 5, '2023-02-01'), -- Observação de Aves
+                                                                                      (1, 7, '2023-02-10'); -- Serviço Voluntário
+
+-- Taylor conquista insígnias
+INSERT INTO conquista_insignia (id_pessoa, id_insignia, data_conquista) VALUES
+                                                                            (1, 1, '2023-03-01'), -- Campeões da Natureza
+                                                                            (1, 5, '2023-03-10'); -- Ação Comunitária
+
+-- Taylor conquista o distintivo Saltador
+INSERT INTO conquista_distintivo (id_progressao, id_distintivo, data_conquista) VALUES
+    (1, 2, '2023-04-01'); -- Saltador
+
+-- John já está no estágio Saltador (etapa 3), vamos dar os dados mínimos
+INSERT INTO conquista_especialidade (id_pessoa, id_especialidade, data_conquista) VALUES
+                                                                                      (6, 1, '2023-07-01'), -- Informática (Ciência e Tecnologia)
+                                                                                      (6, 3, '2023-07-05'), -- Artesanato (Cultura)
+                                                                                      (6, 5, '2023-07-10'); -- Observação de Aves (Meio Ambiente)
+
+-- 1 insígnia
+INSERT INTO conquista_insignia (id_pessoa, id_insignia, data_conquista) VALUES
+    (6, 2, '2023-08-01'); -- Sustentabilidade
+
+-- John conquista o distintivo Saltador
+INSERT INTO conquista_distintivo (id_progressao, id_distintivo, data_conquista) VALUES
+    (6, 2, '2023-09-01');
+
+
+
 -- 1. Jovens aptos para o Cruzeiro do Sul
 SELECT p.nome
 FROM pessoa p
          JOIN progressao_lobinho pl ON p.id_pessoa = pl.id_pessoa
 WHERE pl.id_etapa_atual = 3 -- Saltador
   AND (
-    -- Verifica se participou de pelo menos 3 acampamentos
+-- Verifica se participou de pelo menos 3 acampamentos
     (SELECT COUNT(*) FROM participacao_acampamento pa WHERE pa.id_pessoa = p.id_pessoa) >= 3
-        -- Verifica se conquistou pelo menos 5 especialidades de 3 áreas diferentes
+-- Verifica se conquistou pelo menos 5 especialidades de 3 áreas diferentes
         AND (SELECT COUNT(DISTINCT e.id_area_conhecimento)
              FROM conquista_especialidade ce
                       JOIN especialidade e ON ce.id_especialidade = e.id_especialidade
              WHERE ce.id_pessoa = p.id_pessoa) >= 3
-        -- Verifica se conquistou pelo menos 1 insígnia de interesse especial
+-- Verifica se conquistou pelo menos 1 insígnia de interesse especial
         AND (SELECT COUNT(*) FROM conquista_insignia ci WHERE ci.id_pessoa = p.id_pessoa) >= 1
     );
 
@@ -253,9 +356,30 @@ SELECT e.nome, a.nome AS area
 FROM conquista_especialidade ce
          JOIN especialidade e ON ce.id_especialidade = e.id_especialidade
          JOIN area_conhecimento a ON e.id_area_conhecimento = a.id_area_conhecimento
-WHERE ce.id_pessoa = 1; -- ID do jovem
+WHERE ce.id_pessoa = 7; -- ID do jovem
 
 -- 3. Progressão atual de todos os jovens
+SELECT p.nome, ep.nome AS etapa_atual
+FROM progressao_lobinho pl
+         JOIN pessoa p ON pl.id_pessoa = p.id_pessoa
+         JOIN etapa_progressao ep ON pl.id_etapa_atual = ep.id_etapa;
+SELECT p.nome
+FROM pessoa p
+         JOIN progressao_lobinho pl ON p.id_pessoa = pl.id_pessoa
+WHERE pl.id_etapa_atual = 3 -- Saltador
+  AND (
+    (SELECT COUNT(*) FROM participacao_acampamento pa WHERE pa.id_pessoa = p.id_pessoa) >= 3
+        AND (SELECT COUNT(DISTINCT e.id_area_conhecimento)
+             FROM conquista_especialidade ce
+                      JOIN especialidade e ON ce.id_especialidade = e.id_especialidade
+             WHERE ce.id_pessoa = p.id_pessoa) >= 3
+        AND (SELECT COUNT(*) FROM conquista_insignia ci WHERE ci.id_pessoa = p.id_pessoa) >= 1
+    );
+SELECT e.nome AS especialidade, a.nome AS area
+FROM conquista_especialidade ce
+         JOIN especialidade e ON ce.id_especialidade = e.id_especialidade
+         JOIN area_conhecimento a ON e.id_area_conhecimento = a.id_area_conhecimento
+WHERE ce.id_pessoa = 1;
 SELECT p.nome, ep.nome AS etapa_atual
 FROM progressao_lobinho pl
          JOIN pessoa p ON pl.id_pessoa = p.id_pessoa
