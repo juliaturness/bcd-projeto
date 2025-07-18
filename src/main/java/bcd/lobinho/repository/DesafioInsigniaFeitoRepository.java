@@ -2,10 +2,10 @@ package bcd.lobinho.repository;
 
 import bcd.lobinho.model.DesafioInsigniaFeito;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+
 import java.util.List;
 
-
-public interface DesafioInsigniaFeitoRepository extends JpaRepository<DesafioInsigniaFeito, DesafioInsigniaFeito.DesafioInsigniaFeitoId> {
-    List<DesafioInsigniaFeito> findByPessoaId(Integer idPessoa);
-    List<DesafioInsigniaFeito> findByDesafioInsigniaId(Integer idDesafio);
+@RepositoryRestResource(collectionResourceRel = "desafios-insignia-feito", path = "desafios-insignia-feito")
+public interface DesafioInsigniaFeitoRepository extends JpaRepository<DesafioInsigniaFeito, Integer> {
 }

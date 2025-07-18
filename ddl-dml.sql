@@ -1,386 +1,439 @@
-SET FOREIGN_KEY_CHECKS = 0;
-CREATE DATABASE IF NOT exists LOBINHO;
-USE LOBINHO;
-DROP TABLE IF EXISTS participacao_acampamento;
-DROP TABLE IF EXISTS conquista_distintivo;
-DROP TABLE IF EXISTS conquista_insignia;
-DROP TABLE IF EXISTS conquista_especialidade;
-DROP TABLE IF EXISTS progressao_lobinho;
-DROP TABLE IF EXISTS desafios_distintivos;
-DROP TABLE IF EXISTS distintivo;
-DROP TABLE IF EXISTS especialidade;
-DROP TABLE IF EXISTS area_conhecimento;
-DROP TABLE IF EXISTS insignia;
-DROP TABLE IF EXISTS etapa_progressao;
-DROP TABLE IF EXISTS acampamento;
-DROP TABLE IF EXISTS dado_saude;
-DROP TABLE IF EXISTS problemas_saude;
-DROP TABLE IF EXISTS vinculo;
-DROP TABLE IF EXISTS responsavel;
-DROP TABLE IF EXISTS pessoa;
-DROP TABLE IF EXISTS tipo_sanguineo;
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
+DROP DATABASE sofiadb;
+CREATE DATABASE IF NOT EXISTS sofiadb;
+USE sofiadb;
 
+CREATE TABLE IF NOT EXISTS sofiadb.TipoSanguineo (
+                                                     idTipoSanguineo INT NOT NULL AUTO_INCREMENT,
+                                                     tipo VARCHAR(45) NOT NULL,
 
--- Tabela de Tipos Sanguíneos
-CREATE TABLE IF NOT EXISTS tipo_sanguineo (
-id INT PRIMARY KEY AUTO_INCREMENT,
-descricao VARCHAR(10) NOT NULL
+                                                     PRIMARY KEY (idTipoSanguineo)
 );
 
--- Tabela de Pessoas (Jovens)
-CREATE TABLE IF NOT EXISTS pessoa (
-id_pessoa INT PRIMARY KEY AUTO_INCREMENT,
-nome VARCHAR(100) NOT NULL,
-cpf VARCHAR(14) UNIQUE NOT NULL,
-endereco VARCHAR(200),
-telefone VARCHAR(20),
-data_nascimento DATE,
-genero ENUM('Masculino', 'Feminino', 'Outro'),
-id_tipo_sanguineo INT,
-FOREIGN KEY (id_tipo_sanguineo) REFERENCES tipo_sanguineo(id)
+CREATE TABLE IF NOT EXISTS sofiadb.Jovem (
+                                             idJovem INT NOT NULL AUTO_INCREMENT,
+                                             nome VARCHAR(255) NOT NULL,
+                                             dataNascimento DATETIME NOT NULL,
+                                             telefone VARCHAR(45) NOT NULL,
+                                             email VARCHAR(255) NOT NULL,
+                                             idTipoSanguineo INT NOT NULL,
+
+                                             PRIMARY KEY (idJovem),
+                                             INDEX fk_Jovem_TipoSanguineo_idx (idTipoSanguineo),
+
+                                             CONSTRAINT fk_Jovem_TipoSanguineo FOREIGN KEY (idTipoSanguineo)
+                                                 REFERENCES sofiadb.TipoSanguineo (idTipoSanguineo)
+                                                 ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
--- Tabela de Responsáveis
-CREATE TABLE IF NOT EXISTS responsavel (
-id_responsavel INT PRIMARY KEY AUTO_INCREMENT,
-nome VARCHAR(100) NOT NULL,
-email VARCHAR(100),
-telefone VARCHAR(20)
+CREATE TABLE IF NOT EXISTS sofiadb.Responsavel (
+                                                   idResponsavel INT NOT NULL AUTO_INCREMENT,
+                                                   nome VARCHAR(255) NOT NULL,
+                                                   telefone VARCHAR(45) NOT NULL,
+                                                   email VARCHAR(255) NOT NULL,
+
+                                                   PRIMARY KEY (idResponsavel)
 );
 
--- Tabela de Vínculos
-CREATE TABLE IF NOT EXISTS vinculo (
-id_pessoa INT,
-id_responsavel INT,
-PRIMARY KEY (id_pessoa, id_responsavel),
-FOREIGN KEY (id_pessoa) REFERENCES pessoa(id_pessoa),
-FOREIGN KEY (id_responsavel) REFERENCES responsavel(id_responsavel)
+CREATE TABLE IF NOT EXISTS sofiadb.Vinculo (
+                                               idVinculo INT NOT NULL AUTO_INCREMENT,
+                                               idJovem INT NOT NULL,
+                                               idResponsavel INT NOT NULL,
+
+                                               PRIMARY KEY (id),
+                                               INDEX idx_idResponsavel (idResponsavel),
+                                               INDEX idx_idJovem (idJovem),
+
+                                               CONSTRAINT fk_Vinculo_Jovem FOREIGN KEY (idJovem)
+                                                   REFERENCES sofiadb.Jovem (idJovem)
+                                                   ON DELETE CASCADE ON UPDATE CASCADE,
+
+                                               CONSTRAINT fk_Vinculo_Responsavel FOREIGN KEY (idResponsavel)
+                                                   REFERENCES sofiadb.Responsavel (idResponsavel)
+                                                   ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Tabela de Problemas de Saúde
-CREATE TABLE IF NOT EXISTS problemas_saude (
-id_problema_saude INT PRIMARY KEY AUTO_INCREMENT,
-tipo_problema VARCHAR(50),
-descricao TEXT
+CREATE TABLE IF NOT EXISTS sofiadb.ProblemaSaude (
+                                                     idProblemaSaude INT NOT NULL AUTO_INCREMENT,
+                                                     tipoProblema VARCHAR(255) NOT NULL,
+                                                     descricao VARCHAR(255),
+
+                                                     PRIMARY KEY (idProblemaSaude)
 );
 
--- Tabela de Dados de Saúde
-CREATE TABLE IF NOT EXISTS dado_saude (
-id_pessoa INT PRIMARY KEY,
-id_problema_saude INT,
-FOREIGN KEY (id_pessoa) REFERENCES pessoa(id_pessoa),
-FOREIGN KEY (id_problema_saude) REFERENCES problemas_saude(id_problema_saude)
+CREATE TABLE IF NOT EXISTS sofiadb.Saude (
+                                             id INT NOT NULL AUTO_INCREMENT,
+                                             idJovem INT NOT NULL,
+                                             idProblemaSaude INT NOT NULL,
+
+                                             PRIMARY KEY (id),
+                                             INDEX idx_idJovem (idJovem),
+                                             INDEX idx_idProblemaSaude (idProblemaSaude),
+
+                                             CONSTRAINT fk_Saude_Jovem FOREIGN KEY (idJovem)
+                                                 REFERENCES sofiadb.Jovem (idJovem)
+                                                 ON DELETE CASCADE ON UPDATE CASCADE,
+
+                                             CONSTRAINT fk_Saude_ProblemaSaude FOREIGN KEY (idProblemaSaude)
+                                                 REFERENCES sofiadb.ProblemaSaude (idProblemaSaude)
+                                                 ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Tabela de Etapas de Progressão
-CREATE TABLE IF NOT EXISTS etapa_progressao (
-id_etapa INT PRIMARY KEY AUTO_INCREMENT,
-nome VARCHAR(50) NOT NULL,
-descricao TEXT,
-ordem INT NOT NULL
+CREATE TABLE IF NOT EXISTS sofiadb.Insignia (
+                                                idInsignia INT NOT NULL AUTO_INCREMENT,
+                                                nome VARCHAR(255) NOT NULL,
+
+                                                PRIMARY KEY (idInsignia)
 );
 
--- Tabela de Distintivos de Progressão
-CREATE TABLE IF NOT EXISTS distintivo (
-id_distintivo INT PRIMARY KEY AUTO_INCREMENT,
-nome VARCHAR(50) NOT NULL,
-id_etapa INT,
-FOREIGN KEY (id_etapa) REFERENCES etapa_progressao(id_etapa)
+CREATE TABLE IF NOT EXISTS sofiadb.Desafio (
+                                               idDesafio INT NOT NULL AUTO_INCREMENT,
+                                               nome VARCHAR(255) NOT NULL,
+                                               idInsignia INT,
+
+                                               PRIMARY KEY (idDesafio),
+                                               INDEX idx_idInsignia (idInsignia),
+
+                                               CONSTRAINT fk_Desafio_Insignia FOREIGN KEY (idInsignia)
+                                                   REFERENCES sofiadb.Insignia (idInsignia)
+                                                   ON DELETE SET NULL ON UPDATE CASCADE
 );
 
--- Tabela de Desafios de Distintivos
-CREATE TABLE IF NOT EXISTS desafios_distintivos (
-id_desafio_distintivo INT PRIMARY KEY AUTO_INCREMENT,
-descricao TEXT NOT NULL,
-id_distintivo INT,
-FOREIGN KEY (id_distintivo) REFERENCES distintivo(id_distintivo)
+CREATE TABLE IF NOT EXISTS sofiadb.DesafioInsignia (
+                                                       idDesafioInsignia INT NOT NULL AUTO_INCREMENT,
+                                                       nome VARCHAR(255) NOT NULL,
+                                                       idInsignia INT NOT NULL,
+
+                                                       PRIMARY KEY (idDesafioInsignia),
+                                                       INDEX fk_DesafioInsignia_Insignia_idx (idInsignia),
+
+                                                       CONSTRAINT fk_DesafioInsignia_Insignia FOREIGN KEY (idInsignia)
+                                                           REFERENCES sofiadb.Insignia (idInsignia)
+                                                           ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
--- Tabela de Progressão de Jovens
-CREATE TABLE IF NOT EXISTS progressao_lobinho (
-id_progressao INT PRIMARY KEY AUTO_INCREMENT,
-id_pessoa INT,
-id_etapa_atual INT,
-data_inicio DATE,
-data_conclusao DATE,
-FOREIGN KEY (id_pessoa) REFERENCES pessoa(id_pessoa),
-FOREIGN KEY (id_etapa_atual) REFERENCES etapa_progressao(id_etapa)
+CREATE TABLE IF NOT EXISTS sofiadb.DesafioInsigniaFeita (
+                                                            id INT NOT NULL AUTO_INCREMENT,
+                                                            idDesafioInsignia INT NOT NULL,
+                                                            idJovem INT NOT NULL,
+                                                            data DATETIME NOT NULL,
+
+                                                            PRIMARY KEY (id),
+                                                            INDEX idx_idDesafioInsignia (idDesafioInsignia),
+                                                            INDEX idx_idJovem (idJovem),
+
+                                                            CONSTRAINT fk_DesafioInsigniaFeita_DesafioInsignia FOREIGN KEY (idDesafioInsignia)
+                                                                REFERENCES sofiadb.DesafioInsignia (idDesafioInsignia)
+                                                                ON DELETE NO ACTION ON UPDATE NO ACTION,
+
+                                                            CONSTRAINT fk_DesafioInsigniaFeita_Jovem FOREIGN KEY (idJovem)
+                                                                REFERENCES sofiadb.Jovem (idJovem)
+                                                                ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
--- Tabela de Conquistas de Distintivos
-CREATE TABLE IF NOT EXISTS conquista_distintivo (
-id_progressao INT,
-id_distintivo INT,
-data_conquista DATE,
-PRIMARY KEY (id_progressao, id_distintivo),
-FOREIGN KEY (id_progressao) REFERENCES progressao_lobinho(id_progressao),
-FOREIGN KEY (id_distintivo) REFERENCES distintivo(id_distintivo)
+CREATE TABLE IF NOT EXISTS sofiadb.AreaConhecimento (
+                                                        idAreaConhecimento INT NOT NULL AUTO_INCREMENT,
+                                                        nome VARCHAR(255) NOT NULL,
+
+                                                        PRIMARY KEY (idAreaConhecimento)
 );
 
--- Tabela de Insígnias de Interesse Especial
-CREATE TABLE IF NOT EXISTS insignia (
-id_insignia INT PRIMARY KEY AUTO_INCREMENT,
-nome VARCHAR(50) NOT NULL,
-descricao TEXT
+CREATE TABLE IF NOT EXISTS sofiadb.Especialidade (
+                                                     idEspecialidade INT NOT NULL AUTO_INCREMENT,
+                                                     nome VARCHAR(255) NOT NULL,
+                                                     idAreaConhecimento INT,
+
+                                                     PRIMARY KEY (idEspecialidade),
+                                                     INDEX idx_idAreaConhecimento (idAreaConhecimento),
+
+                                                     CONSTRAINT fk_Especialidade_AreaConhecimento FOREIGN KEY (idAreaConhecimento)
+                                                         REFERENCES sofiadb.AreaConhecimento (idAreaConhecimento)
+                                                         ON DELETE SET NULL ON UPDATE CASCADE
 );
 
--- Tabela de Conquistas de Insígnias
-CREATE TABLE IF NOT EXISTS conquista_insignia (
-id_pessoa INT,
-id_insignia INT,
-data_conquista DATE,
-PRIMARY KEY (id_pessoa, id_insignia),
-FOREIGN KEY (id_pessoa) REFERENCES pessoa(id_pessoa),
-FOREIGN KEY (id_insignia) REFERENCES insignia(id_insignia)
+CREATE TABLE IF NOT EXISTS sofiadb.DesafioEspecialidade (
+                                                            idDesafioEspecialidade INT NOT NULL AUTO_INCREMENT,
+                                                            nome VARCHAR(255) NOT NULL,
+                                                            idEspecialidade INT,
+
+                                                            PRIMARY KEY (idDesafioEspecialidade),
+                                                            INDEX idx_idEspecialidade (idEspecialidade),
+
+                                                            CONSTRAINT fk_DesafioEspecialidade_Especialidade FOREIGN KEY (idEspecialidade)
+                                                                REFERENCES sofiadb.Especialidade (idEspecialidade)
+                                                                ON DELETE SET NULL ON UPDATE CASCADE
+)
+;
+CREATE TABLE IF NOT EXISTS sofiadb.DesafioEspecialidadeFeita (
+                                                                 id INT NOT NULL AUTO_INCREMENT,
+                                                                 idDesafioEspecialidade INT NOT NULL,
+                                                                 idJovem INT NOT NULL,
+                                                                 data DATETIME NOT NULL,
+
+                                                                 PRIMARY KEY (id),
+                                                                 INDEX idx_idDesafioEspecialidade (idDesafioEspecialidade),
+                                                                 INDEX idx_idJovem (idJovem),
+
+                                                                 CONSTRAINT fk_DesafioEspecialidadeFeita_DesafioEspecialidade FOREIGN KEY (idDesafioEspecialidade)
+                                                                     REFERENCES sofiadb.DesafioEspecialidade (idDesafioEspecialidade)
+                                                                     ON DELETE NO ACTION ON UPDATE CASCADE,
+
+                                                                 CONSTRAINT fk_DesafioEspecialidadeFeita_Jovem FOREIGN KEY (idJovem)
+                                                                     REFERENCES sofiadb.Jovem (idJovem)
+                                                                     ON DELETE NO ACTION ON UPDATE CASCADE
 );
 
--- Tabela de Áreas de Conhecimento
-CREATE TABLE IF NOT EXISTS area_conhecimento (
-id_area_conhecimento INT PRIMARY KEY AUTO_INCREMENT,
-nome VARCHAR(50) NOT NULL
+CREATE TABLE IF NOT EXISTS sofiadb.Acampamento (
+                                                   idAcampamento INT NOT NULL AUTO_INCREMENT,
+                                                   nome VARCHAR(255) NOT NULL,
+                                                   data DATETIME NOT NULL,
+
+                                                   PRIMARY KEY (idAcampamento)
 );
 
--- Tabela de Especialidades
-CREATE TABLE IF NOT EXISTS especialidade (
-id_especialidade INT PRIMARY KEY AUTO_INCREMENT,
-nome VARCHAR(50) NOT NULL,
-id_area_conhecimento INT,
-FOREIGN KEY (id_area_conhecimento) REFERENCES area_conhecimento(id_area_conhecimento)
+CREATE TABLE IF NOT EXISTS sofiadb.NoiteAcampada (
+                                                     id INT NOT NULL AUTO_INCREMENT,
+                                                     idAcampamento INT NOT NULL,
+                                                     idJovem INT NOT NULL,
+
+                                                     PRIMARY KEY (id),
+                                                     INDEX idx_idAcampamento (idAcampamento),
+                                                     INDEX idx_idJovem (idJovem),
+
+                                                     CONSTRAINT fk_NoiteAcampada_Acampamento FOREIGN KEY (idAcampamento)
+                                                         REFERENCES sofiadb.Acampamento (idAcampamento)
+                                                         ON DELETE CASCADE ON UPDATE CASCADE,
+
+                                                     CONSTRAINT fk_NoiteAcampada_Jovem FOREIGN KEY (idJovem)
+                                                         REFERENCES sofiadb.Jovem (idJovem)
+                                                         ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Tabela de Conquistas de Especialidades
-CREATE TABLE IF NOT EXISTS conquista_especialidade (
-id_pessoa INT,
-id_especialidade INT,
-data_conquista DATE,
-PRIMARY KEY (id_pessoa, id_especialidade),
-FOREIGN KEY (id_pessoa) REFERENCES pessoa(id_pessoa),
-FOREIGN KEY (id_especialidade) REFERENCES especialidade(id_especialidade)
+CREATE TABLE IF NOT EXISTS sofiadb.Distintivo (
+                                                  idDistintivo INT NOT NULL AUTO_INCREMENT,
+                                                  nome VARCHAR(45) NOT NULL,
+
+                                                  PRIMARY KEY (idDistintivo)
 );
 
--- Tabela de Acampamentos
-CREATE TABLE IF NOT EXISTS acampamento (
-id_acampamento INT PRIMARY KEY AUTO_INCREMENT,
-nome VARCHAR(100) NOT NULL,
-data_inicio DATE,
-data_fim DATE,
-tipo ENUM('Acampamento', 'Acantonamento') NOT NULL
+CREATE TABLE IF NOT EXISTS sofiadb.DesafioDistintivo (
+                                                         idDesafioDistintivo INT NOT NULL AUTO_INCREMENT,
+                                                         descricao VARCHAR(45) NOT NULL,
+                                                         idDistintivo INT,
+
+                                                         PRIMARY KEY (idDesafioDistintivo),
+                                                         INDEX idx_idDistintivo (idDistintivo),
+
+                                                         CONSTRAINT fk_DesafioDistintivo_Distintivo FOREIGN KEY (idDistintivo)
+                                                             REFERENCES sofiadb.Distintivo (idDistintivo)
+                                                             ON DELETE SET NULL ON UPDATE CASCADE
 );
 
--- Tabela de Participação em Acampamentos
-CREATE TABLE IF NOT EXISTS participacao_acampamento (
-id_pessoa INT,
-id_acampamento INT,
-PRIMARY KEY (id_pessoa, id_acampamento),
-FOREIGN KEY (id_pessoa) REFERENCES pessoa(id_pessoa),
-FOREIGN KEY (id_acampamento) REFERENCES acampamento(id_acampamento)
+CREATE TABLE IF NOT EXISTS sofiadb.DesafioDistintivoFeita (
+                                                              id INT NOT NULL AUTO_INCREMENT,
+                                                              idDesafioDistintivo INT NOT NULL,
+                                                              idJovem INT NOT NULL,
+                                                              dataInicio DATETIME NOT NULL,
+                                                              dataFim DATETIME NOT NULL,
+
+                                                              PRIMARY KEY (id),
+                                                              INDEX idx_idDesafioDistintivo (idDesafioDistintivo),
+                                                              INDEX idx_idJovem (idJovem),
+
+                                                              CONSTRAINT fk_DesafioDistintivoFeita_DesafioDistintivo FOREIGN KEY (idDesafioDistintivo)
+                                                                  REFERENCES sofiadb.DesafioDistintivo (idDesafioDistintivo)
+                                                                  ON DELETE NO ACTION ON UPDATE CASCADE,
+
+                                                              CONSTRAINT fk_DesafioDistintivoFeita_Jovem FOREIGN KEY (idJovem)
+                                                                  REFERENCES sofiadb.Jovem (idJovem)
+                                                                  ON DELETE NO ACTION ON UPDATE CASCADE
 );
 
--- Inserção de dados iniciais
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
--- Tipos Sanguíneos
-INSERT INTO tipo_sanguineo (id, descricao) VALUES
-(1, 'A+'), (2, 'A−'), (3, 'B+'), (4, 'B−'),
-(5, 'AB+'), (6, 'AB−'), (7, 'O+'), (8, 'O−');
+-- POVOAMENTO --------------------------------------------------------------------------------------------
 
--- Etapas de Progressão
-INSERT INTO etapa_progressao (id_etapa, nome, descricao, ordem) VALUES
-(1, 'Integrar', 'Primeira etapa do Caminho do Lobinho', 1),
-(2, 'Pata Tenra', 'Segunda etapa de progressão', 2),
-(3, 'Saltador', 'Terceira etapa de progressão', 3),
-(4, 'Cruzeiro do Sul', 'Etapa final de progressão', 4);
+INSERT INTO TipoSanguineo (tipo) VALUES ('A+'), ('A-'), ('B+'), ('B-'), ('AB+'), ('AB-'), ('O+'), ('O-');
 
--- Distintivos de Progressão
-INSERT INTO distintivo (id_distintivo, nome, id_etapa) VALUES
-(1, 'Lobo Pata Tenra', 2),
-(2, 'Lobo Saltador', 3),
-(3, 'Cruzeiro do Sul', 4);
+INSERT INTO Responsavel (nome, telefone, email) VALUES
+                                                    ('Carla Mendes', '(48) 99999-1111', 'carla.mendes@email.com'),
+                                                    ('Rafael Oliveira', '(48) 98888-2222', 'rafael.oliveira@email.com'),
+                                                    ('Joana Pereira', '(48) 97777-3333', 'joana.pereira@email.com');
 
--- Desafios dos Distintivos
-INSERT INTO desafios_distintivos (id_desafio_distintivo, descricao, id_distintivo) VALUES
-(1, 'Conhecer a história do lobinho', 1),
-(2, 'Participar de 3 atividades', 1),
-(3, 'Ajudar em uma boa ação', 2),
-(4, 'Acampar 2 noites', 3);
+INSERT INTO Pessoa (nome, dataNascimento, telefone, email, idTipoSanguineo) VALUES
+                                                                               ('Lucas Mendes', '2015-08-12', '(48) 98888-0001', 'lucas@email.com', 1),
+                                                                               ('Lara Mendes', '2013-05-22', '(48) 98888-0002', 'lara@email.com', 2),
+                                                                               ('Pedro Oliveira', '2014-11-03', '(48) 98888-0003', 'pedro@email.com', 3),
+                                                                               ('Marina Oliveira', '2015-01-17', '(48) 98888-0004', 'marina@email.com', 4),
+                                                                               ('Igor Oliveira', '2016-09-10', '(48) 98888-0005', 'igor@email.com', 5),
+                                                                               ('Ana Pereira', '2014-06-28', '(48) 98888-0006', 'ana@email.com', 6),
+                                                                               ('Felipe Pereira', '2013-12-15', '(48) 98888-0007', 'felipe@email.com', 7),
+                                                                               ('Julia Pereira', '2016-03-09', '(48) 98888-0008', 'julia@email.com', 8);
 
--- Insígnias de Interesse Especial
-INSERT INTO insignia (id_insignia, nome, descricao) VALUES
-(1, 'Campeões da Natureza', 'Insígnia relacionada à preservação ambiental'),
-(2, 'Reduzir, Reciclar, Reutilizar', 'Insígnia sobre sustentabilidade'),
-(3, 'Escoteiros pela Energia Solar', 'Insígnia sobre energia renovável'),
-(4, 'Luzofória', 'Insígnia sobre comunicação'),
-(5, 'Ação Comunitária', 'Insígnia sobre trabalho comunitário'),
-(6, 'Conselho do Sul', 'Insígnia sobre orientação'),
-(7, 'Aprender', 'Insígnia sobre desenvolvimento pessoal');
+-- Carla é responsável por Lucas e Lara
+INSERT INTO Vinculo (idJovem, idResponsavel) VALUES
+                                                 (1, 1), (2, 1);
 
--- Áreas de Conhecimento
-INSERT INTO area_conhecimento (id_area_conhecimento, nome) VALUES
-(1, 'Ciência e Tecnologia'),
-(2, 'Cultura'),
-(3, 'Desportos'),
-(4, 'Meio Ambiente'),
-(5, 'Serviço Comunitário');
+-- Rafael é responsável por Pedro, Marina e Igor
+INSERT INTO Vinculo (idJovem, idResponsavel) VALUES
+                                                 (3, 2), (4, 2), (5, 2);
 
--- Especialidades
-INSERT INTO especialidade (id_especialidade, nome, id_area_conhecimento) VALUES
-(1, 'Informática', 1),
-(2, 'Primeiros Socorros', 1),
-(3, 'Artesanato', 2),
-(4, 'Natação', 3),
-(5, 'Observação de Aves', 4),
-(6, 'Reciclagem', 4),
-(7, 'Serviço Voluntário', 5);
+-- Joana é responsável por Ana, Felipe e Julia
+INSERT INTO Vinculo (idJovem, idResponsavel) VALUES
+                                                 (6, 3), (7, 3), (8, 3);
 
--- Pessoas de exemplo
-INSERT INTO pessoa (id_pessoa, nome, cpf, endereco, telefone, data_nascimento, genero, id_tipo_sanguineo) VALUES
-(1, 'Taylor Swift', '131.131.131-13', 'Av.Industria Da Música, 13 - Santa Catarina - SC', '(48) 99345‑2000', '2010-07-24', 'Feminino', 1),
-(2, 'Betty', '111.333.131-13', 'Av. Folklore, 24 – Rio de Janeiro – RJ', '(21) 92345‑2000', '2011-05-15', 'Feminino', 2),
-(3, 'Augustine', '131.333.131-13', 'Av. Folklore, 24 – Rio de Janeiro – RJ', '(21) 93456‑3000', '2012-03-10', 'Feminino', 1);
+-- ÁREA DE CONHECIMENTO
+INSERT INTO AreaConhecimento (nome) VALUES
+                                        ('Ciência e Tecnologia'), ('Cultura'), ('Desporto'), ('Habilidade Escoteira'), ('Serviço');
 
--- Progressão dos jovens
-INSERT INTO progressao_lobinho (id_progressao, id_pessoa, id_etapa_atual, data_inicio) VALUES
-(1, 1, 3, '2022-01-10'), -- Taylor está no estágio Saltador
-(2, 2, 2, '2023-03-15'), -- Betty está no estágio Pata Tenra
-(3, 3, 1, '2023-09-01'); -- Augustine está no estágio Integrar
+-- ESPECIALIDADE
+INSERT INTO Especialidade (nome, idAreaConhecimento) VALUES
+                                                         ('Radioamadorismo', 1), ('Criptografia', 1),
+                                                         ('História Regional', 2), ('Xadrez', 2),
+                                                         ('Futebol', 3), ('Atletismo', 3),
+                                                         ('Nó e Amarra', 4), ('Orientação', 4),
+                                                         ('Primeiro Socorro', 5), ('Cuidado com Animal', 5);
 
--- Acampamentos
-INSERT INTO acampamento (id_acampamento, nome, data_inicio, data_fim, tipo) VALUES
-(1, 'Acampamento de Páscoa', '2023-04-10', '2023-04-12', 'Acampamento'),
-(2, 'Acantonamento de Inverno', '2023-07-15', '2023-07-16', 'Acantonamento'),
-(3, 'Acampamento de Verão', '2024-01-10', '2024-01-14', 'Acampamento');
+-- DESAFIO DE ESPECIALIDADE (um por especialidade)
+INSERT INTO DesafioEspecialidade (nome, idEspecialidade) VALUES
+                                                             ('Desafio Radioamadorismo', 1),
+                                                             ('Desafio Criptografia', 2),
+                                                             ('Desafio História Regional', 3),
+                                                             ('Desafio Xadrez', 4),
+                                                             ('Desafio Futebol', 5),
+                                                             ('Desafio Atletismo', 6),
+                                                             ('Desafio Nó e Amarra', 7),
+                                                             ('Desafio Orientação', 8),
+                                                             ('Desafio Primeiro Socorro', 9),
+                                                             ('Desafio Cuidado com Animal', 10);
 
--- Participação em acampamentos
-INSERT INTO participacao_acampamento (id_pessoa, id_acampamento) VALUES
-(1, 1), (1, 2), (1, 3), -- Taylor participou de 3 acampamentos
-(2, 1), (2, 2); -- Betty participou de 2 acampamentos
+-- INSÍGNIA DE INTERESSE ESPECIAL
+INSERT INTO Insignia (nome) VALUES
+                                ('Aprender'), ('Servir'), ('Liderar');
 
+-- DESAFIO RELACIONADO A INSÍGNIA
+INSERT INTO DesafioInsignia (nome, idInsignia) VALUES
+                                                   ('Desafio de Aprender - Leitura', 1),
+                                                   ('Desafio de Servir - Comunidade', 2),
+                                                   ('Desafio de Liderar - Patrulha', 3);
 
--- Novas pessoas baseadas nas músicas da Taylor Swift
-INSERT INTO pessoa (id_pessoa, nome, cpf, endereco, telefone, data_nascimento, genero, id_tipo_sanguineo) VALUES
-          (4, 'Cassandra', '113.113.113-13', 'The Tortured Poets Department', '(11) 91111-1111', '2024-04-19', 'Feminino', 1),
-          (5, 'Clara Bow', '213.213.213-13', 'The Tortured Poets Department', '(11) 92222-2222', '2024-04-19', 'Feminino', 2),
-          (6, 'John', '313.313.313-13', 'Speak Now', '(11) 93333-3333', '2010-10-25', 'Masculino', 3),
-          (7, 'Ivy', '413.413.413-13', 'Evermore', '(11) 94444-4444', '2020-12-11', 'Feminino', 4);
+-- DISTINTIVO DE PROGRESSÃO
+INSERT INTO Distintivo (nome) VALUES
+                                  ('Lobo Pata Tenra'), ('Lobo Saltador'), ('Lobo Rastreador'), ('Lobo Caçador'), ('Cruzeiro do Sul');
 
--- Progressão das novas pessoas
-INSERT INTO progressao_lobinho (id_progressao, id_pessoa, id_etapa_atual, data_inicio) VALUES
-(4, 4, 1, '2024-04-21'), -- Cassandra
-(5, 5, 2, '2024-05-01'), -- Clara Bow
-(6, 6, 3, '2023-11-01'), -- John
-(7, 7, 2, '2024-01-10'); -- Ivy
+-- DESAFIO PARA DISTINTIVO
+INSERT INTO DesafioDistintivo (descricao, idDistintivo) VALUES
+                                                            ('Conhecer a alcateia', 1),
+                                                            ('Participar de um jogo simbólico', 2),
+                                                            ('Realizar um acampamento', 3),
+                                                            ('Concluir três especialidades', 4),
+                                                            ('Concluir requisito final', 5);
 
--- Conquistas de especialidades
-INSERT INTO conquista_especialidade (id_pessoa, id_especialidade, data_conquista) VALUES
-(4, 1, '2024-05-01'), -- Informática
-(4, 3, '2024-05-02'), -- Artesanato
+-- ACAMPAMENTO
+INSERT INTO Acampamento (nome, data) VALUES
+                                         ('Acampamento da Lua', '2025-04-20'),
+                                         ('Trilha do Lobinho', '2025-06-10');
 
-(5, 4, '2024-05-03'), -- Natação
-(5, 5, '2024-05-04'), -- Observação de Aves
-(5, 6, '2024-05-05'), -- Reciclagem
+-- NOITE ACAMPADA
+INSERT INTO NoiteAcampada (idAcampamento, idJovem) VALUES
+                                                       (1, 1), (1, 2), (1, 3), (2, 4), (2, 5), (2, 6), (2, 7), (2, 8);
 
-(6, 2, '2023-11-02'), -- Primeiros Socorros
-(6, 6, '2023-11-03'),
-(6, 7, '2023-11-04'), -- Serviço Voluntário
+-- DESAFIO DE ESPECIALIDADE FEITA POR JOVEM
+INSERT INTO DesafioEspecialidadeFeita (idDesafioEspecialidade, idJovem, data) VALUES
+                                                                                  (1, 1, '2025-05-01'),
+                                                                                  (2, 2, '2025-05-02'),
+                                                                                  (3, 3, '2025-05-03'),
+                                                                                  (4, 4, '2025-05-04'),
+                                                                                  (5, 5, '2025-05-05'),
+                                                                                  (6, 6, '2025-05-06'),
+                                                                                  (7, 7, '2025-05-07'),
+                                                                                  (8, 8, '2025-05-08'),
+                                                                                  (9, 1, '2025-05-09'),
+                                                                                  (10, 2, '2025-05-10');
 
-(7, 3, '2024-01-15'), -- Artesanato
-(7, 5, '2024-01-20'), -- Observação de Aves
-(7, 6, '2024-01-25');  -- Reciclagem
+-- DESAFIO DE INSÍGNIA FEITA POR JOVEM
+INSERT INTO DesafioInsigniaFeita (idDesafioInsignia, idJovem, data) VALUES
+                                                                        (1, 1, '2025-05-11'),
+                                                                        (2, 2, '2025-05-12'),
+                                                                        (3, 3, '2025-05-13'),
+                                                                        (1, 4, '2025-05-14'),
+                                                                        (2, 5, '2025-05-15');
 
--- Conquistas de insígnias
-INSERT INTO conquista_insignia (id_pessoa, id_insignia, data_conquista) VALUES
-(4, 1, '2024-05-10'), -- Campeões da Natureza
-(5, 4, '2024-05-11'), -- Luzofória
-(6, 5, '2023-11-05'), -- Ação Comunitária
-(7, 7, '2024-01-30');  -- Aprender
-
--- Participação em acampamentos
-INSERT INTO participacao_acampamento (id_pessoa, id_acampamento) VALUES
-(4, 1),
-(5, 1), (5, 2),
-(6, 1), (6, 2), (6, 3),
-(7, 2), (7, 3);
-
--- Taylor conquista especialidades
-INSERT INTO conquista_especialidade (id_pessoa, id_especialidade, data_conquista) VALUES
-                                                                                      (1, 1, '2023-01-10'), -- Informática
-                                                                                      (1, 3, '2023-01-15'), -- Artesanato
-                                                                                      (1, 4, '2023-01-20'), -- Natação
-                                                                                      (1, 5, '2023-02-01'), -- Observação de Aves
-                                                                                      (1, 7, '2023-02-10'); -- Serviço Voluntário
-
--- Taylor conquista insígnias
-INSERT INTO conquista_insignia (id_pessoa, id_insignia, data_conquista) VALUES
-                                                                            (1, 1, '2023-03-01'), -- Campeões da Natureza
-                                                                            (1, 5, '2023-03-10'); -- Ação Comunitária
-
--- Taylor conquista o distintivo Saltador
-INSERT INTO conquista_distintivo (id_progressao, id_distintivo, data_conquista) VALUES
-    (1, 2, '2023-04-01'); -- Saltador
-
--- John já está no estágio Saltador (etapa 3), vamos dar os dados mínimos
-INSERT INTO conquista_especialidade (id_pessoa, id_especialidade, data_conquista) VALUES
-                                                                                      (6, 1, '2023-07-01'), -- Informática (Ciência e Tecnologia)
-                                                                                      (6, 3, '2023-07-05'), -- Artesanato (Cultura)
-                                                                                      (6, 5, '2023-07-10'); -- Observação de Aves (Meio Ambiente)
-
--- 1 insígnia
-INSERT INTO conquista_insignia (id_pessoa, id_insignia, data_conquista) VALUES
-    (6, 2, '2023-08-01'); -- Sustentabilidade
-
--- John conquista o distintivo Saltador
-INSERT INTO conquista_distintivo (id_progressao, id_distintivo, data_conquista) VALUES
-    (6, 2, '2023-09-01');
+-- DESAFIO DE DISTINTIVO FEITO POR JOVEM
+INSERT INTO DesafioDistintivoFeita (idDesafioDistintivo, idJovem, dataInicio, dataFim) VALUES
+                                                                                           (1, 1, '2025-04-01', '2025-04-15'),
+                                                                                           (2, 2, '2025-04-05', '2025-04-20'),
+                                                                                           (3, 3, '2025-04-10', '2025-04-25'),
+                                                                                           (4, 4, '2025-04-15', '2025-04-30'),
+                                                                                           (5, 5, '2025-05-01', '2025-05-15');
 
 
 
--- 1. Jovens aptos para o Cruzeiro do Sul
-SELECT p.nome
-FROM pessoa p
-         JOIN progressao_lobinho pl ON p.id_pessoa = pl.id_pessoa
-WHERE pl.id_etapa_atual = 3 -- Saltador
-  AND (
--- Verifica se participou de pelo menos 3 acampamentos
-    (SELECT COUNT(*) FROM participacao_acampamento pa WHERE pa.id_pessoa = p.id_pessoa) >= 3
--- Verifica se conquistou pelo menos 5 especialidades de 3 áreas diferentes
-        AND (SELECT COUNT(DISTINCT e.id_area_conhecimento)
-             FROM conquista_especialidade ce
-                      JOIN especialidade e ON ce.id_especialidade = e.id_especialidade
-             WHERE ce.id_pessoa = p.id_pessoa) >= 3
--- Verifica se conquistou pelo menos 1 insígnia de interesse especial
-        AND (SELECT COUNT(*) FROM conquista_insignia ci WHERE ci.id_pessoa = p.id_pessoa) >= 1
-    );
+-- 1. Inserir novo lobinho (jovem)
+INSERT INTO Jovem (nome, dataNascimento, telefone, email, idTipoSanguineo)
+VALUES ('Sofia Alves Toreti', '2015-02-09', '(47) 99454-3482', 'sofia.a2005@aluno.ifsc.edu.br', 1);
 
--- 2. Especialidades de um jovem específico
-SELECT e.nome, a.nome AS area
-FROM conquista_especialidade ce
-         JOIN especialidade e ON ce.id_especialidade = e.id_especialidade
-         JOIN area_conhecimento a ON e.id_area_conhecimento = a.id_area_conhecimento
-WHERE ce.id_pessoa = 7; -- ID do jovem
+-- 2. Vincular responsável (vamos usar um responsável existente, ex: idResponsavel = 1)
+INSERT INTO Vinculo (idJovem, idResponsavel)
+VALUES (9, 1);
 
--- 3. Progressão atual de todos os jovens
-SELECT p.nome, ep.nome AS etapa_atual
-FROM progressao_lobinho pl
-         JOIN pessoa p ON pl.id_pessoa = p.id_pessoa
-         JOIN etapa_progressao ep ON pl.id_etapa_atual = ep.id_etapa;
-SELECT p.nome
-FROM pessoa p
-         JOIN progressao_lobinho pl ON p.id_pessoa = pl.id_pessoa
-WHERE pl.id_etapa_atual = 3 -- Saltador
-  AND (
-    (SELECT COUNT(*) FROM participacao_acampamento pa WHERE pa.id_pessoa = p.id_pessoa) >= 3
-        AND (SELECT COUNT(DISTINCT e.id_area_conhecimento)
-             FROM conquista_especialidade ce
-                      JOIN especialidade e ON ce.id_especialidade = e.id_especialidade
-             WHERE ce.id_pessoa = p.id_pessoa) >= 3
-        AND (SELECT COUNT(*) FROM conquista_insignia ci WHERE ci.id_pessoa = p.id_pessoa) >= 1
-    );
-SELECT e.nome AS especialidade, a.nome AS area
-FROM conquista_especialidade ce
-         JOIN especialidade e ON ce.id_especialidade = e.id_especialidade
-         JOIN area_conhecimento a ON e.id_area_conhecimento = a.id_area_conhecimento
-WHERE ce.id_pessoa = 1;
-SELECT p.nome, ep.nome AS etapa_atual
-FROM progressao_lobinho pl
-         JOIN pessoa p ON pl.id_pessoa = p.id_pessoa
-         JOIN etapa_progressao ep ON pl.id_etapa_atual = ep.id_etapa;
+-- 3. Inserir 1 insígnia feita para esse lobinho (ex: idDesafioInsignia = 1)
+INSERT INTO DesafioInsigniaFeita (idDesafioInsignia, idJovem, data)
+VALUES (1, 9, NOW());
+
+-- 4. Inserir pelo menos 5 especialidades feitas em pelo menos 3 áreas diferentes
+
+-- Vamos pegar 5 especialidades distintas (IDs 1 a 5, de áreas diferentes)
+INSERT INTO DesafioEspecialidadeFeita (idDesafioEspecialidade, idJovem, data) VALUES
+                                                                                  (1, 9, NOW()),
+                                                                                  (2, 9, NOW()),
+                                                                                  (3, 9, NOW()),
+                                                                                  (4, 9, NOW()),
+                                                                                  (5, 9, NOW());
+
+-- 5. Dar o distintivo Lobo Caçador ao lobinho (idDesafioDistintivo relacionado ao Lobo Caçador = 4)
+INSERT INTO DesafioDistintivoFeita (idDesafioDistintivo, idJovem, dataInicio, dataFim)
+VALUES (4, 9, NOW(), DATE_ADD(NOW(), INTERVAL 15 DAY));
+
+-- 6. Dar o distintivo Cruzeiro do Sul ao lobinho (idDesafioDistintivo = 5)
+INSERT INTO DesafioDistintivoFeita (idDesafioDistintivo, idJovem, dataInicio, dataFim)
+VALUES (5, 9, NOW(), DATE_ADD(NOW(), INTERVAL 15 DAY));
+
+
+
+
+SELECT j.idJovem, j.nome FROM Jovem j
+
+-- Verifica se o jovem tem o distintivo "Lobo Caçador" (idDistintivo = 4)
+                                  INNER JOIN DesafioDistintivoFeita ddf_lc ON ddf_lc.idJovem = j.idJovem
+                                  INNER JOIN DesafioDistintivo dd_lc ON dd_lc.idDesafioDistintivo = ddf_lc.idDesafioDistintivo
+                                  INNER JOIN Distintivo dist_lc ON dist_lc.idDistintivo = dd_lc.idDistintivo
+    AND dist_lc.nome = 'Lobo Caçador'
+
+-- Verifica se o jovem tem o distintivo "Cruzeiro do Sul"
+                                  INNER JOIN DesafioDistintivoFeita ddf_cs ON ddf_cs.idJovem = j.idJovem
+                                  INNER JOIN DesafioDistintivo dd_cs ON dd_cs.idDesafioDistintivo = ddf_cs.idDesafioDistintivo
+                                  INNER JOIN Distintivo dist_cs ON dist_cs.idDistintivo = dd_cs.idDistintivo
+    AND dist_cs.nome = 'Cruzeiro do Sul'
+
+-- Verifica se tem pelo menos 1 insígnia feita
+                                  INNER JOIN DesafioInsigniaFeita dif ON dif.idJovem = j.idJovem
+
+-- Verifica especialidades feitas (pelo menos 5) em pelo menos 3 áreas de conhecimento distintas
+                                  INNER JOIN DesafioEspecialidadeFeita def ON def.idJovem = j.idJovem
+                                  INNER JOIN DesafioEspecialidade de ON de.idDesafioEspecialidade = def.idDesafioEspecialidade
+                                  INNER JOIN Especialidade e ON e.idEspecialidade = de.idEspecialidade
+                                  INNER JOIN AreaConhecimento ac ON ac.idAreaConhecimento = e.idAreaConhecimento
+
+GROUP BY j.idJovem, j.nome
+
+HAVING
+    COUNT(DISTINCT def.idDesafioEspecialidade) >= 5 -- pelo menos 5 especialidades feitas
+   AND COUNT(DISTINCT ac.idAreaConhecimento) >= 3 -- pelo menos 3 áreas de conhecimento diferentes
+   AND COUNT(DISTINCT dif.idDesafioInsignia) >= 1 -- pelo menos 1 insígnia feita
+;

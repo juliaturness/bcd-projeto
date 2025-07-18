@@ -2,19 +2,20 @@ package bcd.lobinho.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @Entity
-@Table(name = "responsavel")
-public class Responsavel {
+@AllArgsConstructor
+public class Responsavel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_responsavel")
-    private Integer id;
+    private Integer idResponsavel;
 
     @ManyToOne
-    @JoinColumn(name = "id_pessoa", nullable = false)
+    @JoinColumn(nullable = false)
     private Pessoa pessoa;
 
     @Column(nullable = false, length = 100)
@@ -26,6 +27,8 @@ public class Responsavel {
     @Column(length = 20, nullable = false)
     private String telefone;
 
-    @OneToMany(mappedBy = "responsavel")
+    @OneToMany(mappedBy = "responsavel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vinculo> vinculos;
+
+    protected Responsavel() {}
 }

@@ -2,10 +2,9 @@ package bcd.lobinho.repository;
 
 import bcd.lobinho.model.Acampamento;
 import org.springframework.data.jpa.repository.JpaRepository;
-import java.time.LocalDate;
-import java.util.List;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
+@RepositoryRestResource(collectionResourceRel = "acampamentos", path = "acampamentos")
 public interface AcampamentoRepository extends JpaRepository<Acampamento, Integer> {
-    List<Acampamento> findByNomeContainingIgnoreCase(String nome);
-    List<Acampamento> findByDataBetween(LocalDate inicio, LocalDate fim);
+
 }

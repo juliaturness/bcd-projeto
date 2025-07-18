@@ -2,25 +2,29 @@ package bcd.lobinho.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "desafio_especialidade")
-public class DesafioEspecialidade {
+@AllArgsConstructor
+public class DesafioEspecialidade implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_desafio_especialidade")
-    private Integer id;
+    private Integer idDesafioEspecialidade;
 
     @Column(nullable = false, length = 500)
     private String descricao;
 
     @ManyToOne
-    @JoinColumn(name = "id_especialidade", nullable = false)
+    @JoinColumn(name = "idEspecialidade", nullable = false)
     private Especialidade especialidade;
 
-    @OneToMany(mappedBy = "desafioEspecialidade")
-    private List<DesafioEspecialidadeFeito> realizacoes;
+    @OneToMany(mappedBy = "desafioEspecialidade", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DesafioEspecialidadeFeito> desafiofeitos;
+
+    protected DesafioEspecialidade() {}
 }

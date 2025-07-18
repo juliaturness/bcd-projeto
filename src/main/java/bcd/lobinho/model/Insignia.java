@@ -2,20 +2,24 @@ package bcd.lobinho.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @Entity
-@Table(name = "insignia")
-public class Insignia {
+@AllArgsConstructor
+public class Insignia implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_insignia")
-    private Integer id;
+    private Integer idInsignia;
 
     @Column(nullable = false, length = 50)
     private String nome;
 
     @OneToMany(mappedBy = "insignia", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DesafioInsignia> desafios;
+    private List<DesafioInsignia> desafiosInsignia;
+
+    protected Insignia() {}
 }

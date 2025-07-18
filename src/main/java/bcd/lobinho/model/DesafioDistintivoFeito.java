@@ -3,35 +3,34 @@ package bcd.lobinho.model;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "desafio_distintivo_feito")
-public class DesafioDistintivoFeito {
-    @EmbeddedId
-    private DesafioDistintivoFeitoId id;
+@AllArgsConstructor
+public class DesafioDistintivoFeito implements Serializable {
 
-    @Column(name = "data_inicio")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer idDesafioDistintivoFeito;
+
+    @Column(nullable = false)
     private LocalDate dataInicio;
 
-    @Column(name = "data_fim")
+    @Column(nullable = false)
     private LocalDate dataFim;
 
     @ManyToOne
-    @MapsId("idDesafioDistintivo")
-    @JoinColumn(name = "id_desafio_distintivo")
+    @JoinColumn(name = "idDesafioDistintivo",  nullable = false)
     private DesafioDistintivo desafioDistintivo;
 
     @ManyToOne
-    @MapsId("idPessoa")
-    @JoinColumn(name = "id_pessoa")
+    @JoinColumn(name = "idPessoa", nullable = false)
     private Pessoa pessoa;
 
+    protected DesafioDistintivoFeito() {}
 
-    @Embeddable
-    public class DesafioDistintivoFeitoId implements Serializable {
-        private Integer idDesafioDistintivo;
-        private Integer idPessoa;
-    }
+
 }

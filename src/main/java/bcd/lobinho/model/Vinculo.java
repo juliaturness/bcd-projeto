@@ -6,27 +6,20 @@ import java.io.Serializable;
 
 @Data
 @Entity
-@Table(name = "vinculo")
-public class Vinculo {
-    @EmbeddedId
-    private VinculoId id;
+@AllArgsConstructor
+public class Vinculo implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id_vinculo;
 
     @ManyToOne
-    @MapsId("idPessoa")
-    @JoinColumn(name = "id_pessoa")
+    @JoinColumn(name = "idPessoa", nullable = false)
     private Pessoa pessoa;
 
     @ManyToOne
-    @MapsId("idResponsavel")
-    @JoinColumn(name = "id_responsavel")
+    @JoinColumn(name = "idResponsavel", nullable = false)
     private Responsavel responsavel;
 
-    @Embeddable
-    public static class VinculoId implements Serializable {
-        @Column(name = "id_pessoa")
-        private Integer idPessoa;
-
-        @Column(name = "id_responsavel")
-        private Integer idResponsavel;
-    }
+    protected Vinculo() {}
 }

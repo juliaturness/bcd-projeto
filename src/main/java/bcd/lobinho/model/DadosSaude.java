@@ -9,19 +9,16 @@ import java.io.Serializable;
 @Entity
 @Table(name = "dados_saude")
 public class DadosSaude {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer idDadosSaude;
+
     @OneToOne
-    @JoinColumn(name = "id_pessoa")
+    @JoinColumn(name = "idPessoa")
     private Pessoa pessoa;
 
     @ManyToOne
-    @JoinColumn(name = "id_problema_saude")
-    private ProblemasSaude problemaSaude;
-
-    public class DadosSaudeId implements Serializable {
-        private Long pessoa;
-        private Long problemaSaude;
-
-        // construtores, equals e hashCode
-    }
+    @JoinColumn(name = "idProblema")
+    private ProblemasSaude problema;
 }

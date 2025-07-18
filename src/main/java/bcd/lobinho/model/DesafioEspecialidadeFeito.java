@@ -7,30 +7,23 @@ import java.time.LocalDate;
 
 @Data
 @Entity
-@Table(name = "desafio_especialidade_feito")
-public class DesafioEspecialidadeFeito {
-    @EmbeddedId
-    private DesafioEspecialidadeFeitoId id;
+@AllArgsConstructor
+public class DesafioEspecialidadeFeito implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer idDesafioEspecialidadeFeito;
 
     @Column(nullable = false)
     private LocalDate data;
 
     @ManyToOne
-    @MapsId("idDesafioEspecialidade")
-    @JoinColumn(name = "id_desafio_especialidade", nullable = false)
+    @JoinColumn(name = "idDesafioEspecialidade", nullable = false)
     private DesafioEspecialidade desafioEspecialidade;
 
     @ManyToOne
-    @MapsId("idPessoa")
-    @JoinColumn(name = "id_pessoa", nullable = false)
+    @JoinColumn(name = "idPessoa", nullable = false)
     private Pessoa pessoa;
 
-    @Embeddable
-    public class DesafioEspecialidadeFeitoId implements Serializable {
-        @Column(name = "id_desafio_especialidade")
-        private Integer idDesafioEspecialidade;
-
-        @Column(name = "id_pessoa")
-        private Integer idPessoa;
-    }
+    protected DesafioEspecialidadeFeito() {}
 }
