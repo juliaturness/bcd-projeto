@@ -8,4 +8,5 @@ import java.util.List;
 
 @RepositoryRestResource(collectionResourceRel = "desafios-distintivo", path = "desafios-distintivo")
 public interface DesafioDistintivoRepository extends JpaRepository<DesafioDistintivo, Integer> {
+
 }

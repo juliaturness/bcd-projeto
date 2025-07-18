@@ -23,4 +23,8 @@ public class DadosSaude {
     private ProblemasSaude problema;
 
     protected DadosSaude(){}
+
+    public Object getProblemaSaude() {
+        return problema;
+    }
 }

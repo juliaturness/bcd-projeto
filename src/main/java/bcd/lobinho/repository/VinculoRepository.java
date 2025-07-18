@@ -1,5 +1,7 @@
 package bcd.lobinho.repository;
 
+import bcd.lobinho.model.DesafioDistintivoFeito;
+import bcd.lobinho.model.Pessoa;
 import bcd.lobinho.model.Vinculo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,4 +11,6 @@ import java.util.List;
 
 @RepositoryRestResource(collectionResourceRel = "vinculo", path = "vinculo")
 public interface VinculoRepository extends JpaRepository<Vinculo, Integer> {
+    List<Vinculo> findByPessoa(Pessoa pessoa);
+
 }
