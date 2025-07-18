@@ -1,7 +1,9 @@
 package bcd.lobinho.service;
 
 import bcd.lobinho.exception.ResourceNotFoundException;
+import bcd.lobinho.model.Pessoa;
 import bcd.lobinho.model.Responsavel;
+import bcd.lobinho.model.TipoSanguineo;
 import bcd.lobinho.repository.ResponsavelRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,8 +37,7 @@ public class ResponsavelService {
 
     @Transactional
     public Responsavel atualizar(Integer id, Responsavel responsavelAtualizado) {
-        Responsavel responsavel = responsavelRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Responsável não encontrado"));
+        Responsavel responsavel = responsavelRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Responsável não encontrado"));
 
         responsavel.setNome(responsavelAtualizado.getNome());
         responsavel.setEmail(responsavelAtualizado.getEmail());
@@ -49,7 +50,10 @@ public class ResponsavelService {
         return responsavelRepository.findByPessoaId(idPessoa);
     }
 
-    public Responsavel criar(Responsavel responsavel) {
-
+    public Responsavel criar(Responsavel pessoa) {
+        return responsavelRepository.save(pessoa);
     }
+
+
+
 }
