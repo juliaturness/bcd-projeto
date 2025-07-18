@@ -7,7 +7,7 @@ import java.io.Serializable;
 @Data
 @Entity
 @AllArgsConstructor
-@Table(name = "NoiteAcampada" )
+@Table(name = "NoiteAcampada")
 public class NoiteAcampada implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,9 +18,8 @@ public class NoiteAcampada implements Serializable {
     private Acampamento acampamento;
 
     @ManyToOne
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "idPessoa", nullable = false)
     private Pessoa pessoa;
 
     protected NoiteAcampada() {}
-
 }

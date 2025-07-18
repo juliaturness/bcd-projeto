@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @Entity
 @AllArgsConstructor
-@Table(name = "Pessoa" )
+@Table(name = "Pessoa")
 public class Pessoa implements Serializable {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -35,13 +35,12 @@ public class Pessoa implements Serializable {
     @Column(nullable = false)
     private String genero;
 
-
     @ManyToOne
     @JoinColumn(name = "idTipoSanguineo")
     private TipoSanguineo tipoSanguineo;
 
     @OneToOne(mappedBy = "pessoa", cascade = CascadeType.ALL, orphanRemoval = true)
-    private DadosSaude dadoSaude;
+    private DadosSaude dadosSaude;
 
     @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vinculo> vinculos;

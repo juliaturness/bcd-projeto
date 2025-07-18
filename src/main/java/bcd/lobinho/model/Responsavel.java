@@ -9,14 +9,14 @@ import java.util.List;
 @Data
 @Entity
 @AllArgsConstructor
-@Table(name = "Responsavel" )
+@Table(name = "Responsavel")
 public class Responsavel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idResponsavel;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "pessoa_idPessoa", nullable = false)
     private Pessoa pessoa;
 
     @Column(nullable = false, length = 100)

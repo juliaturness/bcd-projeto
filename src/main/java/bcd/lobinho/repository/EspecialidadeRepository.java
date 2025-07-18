@@ -6,7 +6,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
 
-@RepositoryRestResource(collectionResourceRel = "especialidade", path = "especialidade")
+@RepositoryRestResource(collectionResourceRel = "especialidade", path = "Especialidade")
 public interface EspecialidadeRepository extends JpaRepository<Especialidade, Integer> {
 
 }
