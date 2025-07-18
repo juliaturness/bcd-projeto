@@ -7,6 +7,7 @@ import java.io.Serializable;
 @Data
 @Entity
 @AllArgsConstructor
+@Table(name = "Vinculo" )
 public class Vinculo implements Serializable {
 
     @Id

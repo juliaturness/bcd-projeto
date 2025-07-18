@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "desafio_insignia")
+@Table(name = "DesafioInsignia")
 @AllArgsConstructor
 public class DesafioInsignia implements Serializable {
 

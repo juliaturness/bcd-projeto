@@ -10,6 +10,7 @@ import lombok.Data;
 @Data
 @Entity
 @AllArgsConstructor
+@Table(name = "DesafioDistintivoFeito" )
 public class DesafioDistintivoFeito implements Serializable {
 
     @Id

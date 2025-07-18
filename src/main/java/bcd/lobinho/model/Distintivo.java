@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @Entity
 @AllArgsConstructor
+@Table(name = "Distintivo" )
 public class Distintivo implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

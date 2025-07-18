@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 @Entity
 @AllArgsConstructor
+@Table(name = "Insignia" )
 public class Insignia implements Serializable {
 
     @Id

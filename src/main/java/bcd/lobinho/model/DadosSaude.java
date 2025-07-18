@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Data
 @Entity
-@Table(name = "dados_saude")
+@Table(name = "Dadosaude")
 public class DadosSaude {
 
     @Id
@@ -21,4 +21,6 @@ public class DadosSaude {
     @ManyToOne
     @JoinColumn(name = "idProblema")
     private ProblemasSaude problema;
+
+    protected DadosSaude(){}
 }

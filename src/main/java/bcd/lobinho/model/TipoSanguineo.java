@@ -11,6 +11,7 @@ import lombok.Data;
 @Data
 @Entity
 @AllArgsConstructor
+@Table(name = "TipoSanguineo" )
 public class TipoSanguineo implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

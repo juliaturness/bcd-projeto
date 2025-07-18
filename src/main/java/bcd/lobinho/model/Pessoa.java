@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 @Entity
 @AllArgsConstructor
+@Table(name = "Pessoa" )
 public class Pessoa implements Serializable {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)

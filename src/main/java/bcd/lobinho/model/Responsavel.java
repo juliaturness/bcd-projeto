@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 @Entity
 @AllArgsConstructor
+@Table(name = "Responsavel" )
 public class Responsavel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

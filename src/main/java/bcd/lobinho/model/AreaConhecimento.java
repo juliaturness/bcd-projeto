@@ -8,6 +8,7 @@ import java.util.List;
 
 @Data
 @Entity
+@Table(name = "AreaConhecimento" )
 @AllArgsConstructor
 public class AreaConhecimento implements Serializable {
     @Id

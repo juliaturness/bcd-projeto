@@ -11,6 +11,7 @@ import lombok.Data;
 @Data
 @Entity
 @AllArgsConstructor
+@Table(name = "ProblemasSaude" )
 public class ProblemasSaude implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +22,7 @@ public class ProblemasSaude implements Serializable {
 
     private String descricao;
 
-    @OneToMany(mappedBy = "problema")
+    @OneToMany(mappedBy = "problema", cascade = CascadeType.ALL)
     private List<DadosSaude> dadosSaude;
 
     protected ProblemasSaude() {}

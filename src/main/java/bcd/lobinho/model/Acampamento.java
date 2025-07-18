@@ -11,6 +11,7 @@ import java.util.List;
 
 @Data
 @Entity
+@Table(name = "Acampamento" )
 @AllArgsConstructor
 public class Acampamento implements Serializable {
 

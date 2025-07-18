@@ -11,6 +11,7 @@ import lombok.Data;
 @Data
 @Entity
 @AllArgsConstructor
+@Table(name = "Especialidade" )
 public class Especialidade implements Serializable {
 
     @Id
